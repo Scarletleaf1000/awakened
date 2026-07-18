@@ -1,6 +1,7 @@
 package me.scarletleaf1000.awakened.breath;
 
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import net.minecraft.server.level.ServerPlayer;
@@ -108,24 +109,28 @@ public class BreathEvents {
             int victimBreath = victim.getCapability(BreathProvider.BREATH)
                     .map(IBreath::getBreath)
                     .orElse(0);
-            if (victimBreath <= 0) {
+            if (Heightening.fromBreath(victimBreath) == Heightening.DRAB) {
                 return;
             }
-            int loss = Math.min(25, Math.max(1, victimBreath / 10));
-            victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(loss));
 
             if (killer instanceof Player killerPlayer) {
-                int gain = Math.max(1, victimBreath / 5); // 20% of victim's breath
-                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(gain));
+                int transfer = Math.max(1, victimBreath / 5);
+                victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
+                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+            } else {
+                int loss = Math.min(25, Math.max(1, victimBreath / 10));
+                victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(loss));
             }
         } else if (killer instanceof Player killerPlayer) {
             int victimBreath = victim.getCapability(BreathProvider.BREATH)
                     .map(IBreath::getBreath)
                     .orElse(0);
-            int gain = Math.max(1, victimBreath / 20); // 5% of victim's breath
-            if (gain > 0) {
-                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(gain));
+            if (victimBreath < 20) {
+                return;
             }
+            int transfer = victimBreath / 20;
+            victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
+            killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
         }
     }
 
