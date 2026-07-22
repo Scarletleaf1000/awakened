@@ -26,7 +26,11 @@ public class AwakenedItemRenderer extends EntityRenderer<AwakenedItemEntity> {
     public void render(AwakenedItemEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
         poseStack.translate(0.0F, entity.getBbHeight() / 2.0F + 0.1F, 0.0F);
-        poseStack.scale(2.0F, 2.0F, 2.0F);
+
+        boolean block = entity.getItem().getItem() instanceof net.minecraft.world.item.BlockItem;
+        float scale = block ? 2.5F : 2.0F;
+        poseStack.scale(scale, scale, scale);
+
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 entity.getItem(),
                 ItemDisplayContext.GROUND,

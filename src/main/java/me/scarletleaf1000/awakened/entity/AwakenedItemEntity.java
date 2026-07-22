@@ -17,8 +17,10 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -94,17 +96,19 @@ public class AwakenedItemEntity extends ItemEntity {
 
     @Override
     public EntityDimensions getDimensions(Pose pose) {
-        return EntityDimensions.scalable(0.8f, 0.8f);
+        return isBlockItem()
+                ? EntityDimensions.scalable(1.0f, 1.0f)
+                : EntityDimensions.scalable(0.8f, 0.8f);
     }
 
     @Override
     public boolean canBeCollidedWith() {
-        return true;
+        return isBlockItem();
     }
 
     @Override
     public boolean isPushable() {
-        return true;
+        return isBlockItem();
     }
 
     @Override
@@ -131,8 +135,18 @@ public class AwakenedItemEntity extends ItemEntity {
             return true;
         }
 
-        this.markHurt();
-        return true;
+        if (source.getEntity() instanceof Player player) {
+            this.markHurt();
+            Vec3 push = this.position().subtract(player.position());
+            push = new Vec3(push.x, 0.0, push.z);
+            if (push.lengthSqr() < 1.0E-4) {
+                push = new Vec3(0.0, 0.0, 1.0);
+            }
+            push = push.normalize().scale(0.35).add(0.0, 0.18, 0.0);
+            this.setDeltaMovement(this.getDeltaMovement().add(push));
+        }
+
+        return false;
     }
 
     @Override
@@ -165,6 +179,11 @@ public class AwakenedItemEntity extends ItemEntity {
         CompoundTag root = getCommandData();
         root.putInt(TAG_BREATH, Math.max(0, amount));
         this.entityData.set(DATA_COMMAND, root);
+    }
+
+    private boolean isBlockItem() {
+        ItemStack stack = this.getItem();
+        return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
     }
 
     @Override
