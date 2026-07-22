@@ -3,6 +3,7 @@ package me.scarletleaf1000.awakened.command;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.command.actions.AttackTargetAction;
 import me.scarletleaf1000.awakened.command.actions.FollowOwnerAction;
+import me.scarletleaf1000.awakened.command.actions.SummonEntityAction;
 import me.scarletleaf1000.awakened.command.targets.InteractingEntityTarget;
 import me.scarletleaf1000.awakened.command.targets.NearestHostileTarget;
 import me.scarletleaf1000.awakened.command.triggers.OnInteractTrigger;
@@ -32,6 +33,7 @@ public class CommandRegistries {
 
     public static final RegistryObject<Action> FOLLOW_OWNER = ACTIONS.register("follow_owner", FollowOwnerAction::new);
     public static final RegistryObject<Action> ATTACK_TARGET = ACTIONS.register("attack_target", AttackTargetAction::new);
+    public static final RegistryObject<Action> SUMMON_ENTITY = ACTIONS.register("summon_entity", SummonEntityAction::new);
 
     public static final RegistryObject<Target> INTERACTING_ENTITY = TARGETS.register("interacting_entity", InteractingEntityTarget::new);
     public static final RegistryObject<Target> NEAREST_HOSTILE = TARGETS.register("nearest_hostile", NearestHostileTarget::new);

@@ -14,6 +14,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -61,19 +62,22 @@ public class AwakeningCommandUseC2SPacket {
                             AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
                         }
                     } else if (command.action().transformsToEntity()) {
-                        ItemStack held = player.getMainHandItem();
-                        if (!held.isEmpty()) {
-                            ItemStack visual = held.copy();
-                            visual.setCount(1);
-
-                            AwakenedItemEntity entity = new AwakenedItemEntity(AwakenedEntityRegistries.AWAKENED_ITEM.get(), player.level());
-                            entity.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
-                            entity.setItem(visual);
-                            entity.setCommandData(triggerId, actionId, targetId, storedBreath, player.getUUID());
-                            player.level().addFreshEntity(entity);
-
-                            held.shrink(1);
+                        ItemStack source = findItemToTransform(player);
+                        if (source == null || source.isEmpty()) {
+                            player.sendSystemMessage(Component.literal("You need an item in your inventory to summon an awakened entity."));
+                            return;
                         }
+
+                        ItemStack visual = source.copy();
+                        visual.setCount(1);
+
+                        AwakenedItemEntity entity = new AwakenedItemEntity(AwakenedEntityRegistries.AWAKENED_ITEM.get(), player.level());
+                        entity.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
+                        entity.setItem(visual);
+                        entity.setCommandData(triggerId, actionId, targetId, storedBreath, player.getUUID());
+                        player.level().addFreshEntity(entity);
+
+                        source.shrink(1);
                     } else {
                         CommandContext commandCtx = new CommandContext(player, player.level());
                         command.evaluateAndExecute(commandCtx);
@@ -100,5 +104,27 @@ public class AwakeningCommandUseC2SPacket {
         return command.trigger().getDisplayName().getString() + " "
                 + command.action().getDisplayName().getString() + " "
                 + command.target().getDisplayName().getString();
+    }
+
+    @javax.annotation.Nullable
+    private static ItemStack findItemToTransform(ServerPlayer player) {
+        ItemStack main = player.getMainHandItem();
+        if (!main.isEmpty()) {
+            return main;
+        }
+
+        Inventory inventory = player.getInventory();
+        ItemStack offhand = inventory.offhand.get(0);
+        if (!offhand.isEmpty()) {
+            return offhand;
+        }
+
+        for (ItemStack stack : inventory.items) {
+            if (!stack.isEmpty()) {
+                return stack;
+            }
+        }
+
+        return null;
     }
 }

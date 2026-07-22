@@ -101,12 +101,12 @@ public class AwakenedItemEntity extends ItemEntity {
 
     @Override
     public boolean canBeCollidedWith() {
-        return isBlockItem();
+        return false;
     }
 
     @Override
     public boolean isPushable() {
-        return true;
+        return false;
     }
 
     @Override
