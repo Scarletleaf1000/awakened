@@ -3,30 +3,27 @@ package me.scarletleaf1000.awakened.command;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
+import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 
-/**
- * Combinator that turns registry IDs into a validated {@link Command}.
- */
 public final class CommandBuilder {
     private CommandBuilder() {
     }
 
-    public static Command build(ResourceLocation triggerId, ResourceLocation actionId, int availableTier) {
-        return build(triggerId, actionId, Optional.empty(), availableTier);
-    }
-
-    public static Command build(ResourceLocation triggerId, ResourceLocation actionId, Optional<ResourceLocation> conditionId, int availableTier) {
+    public static Command build(ResourceLocation triggerId, ResourceLocation actionId, ResourceLocation targetId, int availableTier) {
         Trigger trigger = getEntry(CommandRegistries.TRIGGER_REGISTRY.get(), triggerId);
         Action action = getEntry(CommandRegistries.ACTION_REGISTRY.get(), actionId);
-        Optional<Condition> condition = conditionId.map(id -> getEntry(CommandRegistries.CONDITION_REGISTRY.get(), id));
+        Target target = getEntry(CommandRegistries.TARGET_REGISTRY.get(), targetId);
 
         validateTier(trigger, triggerId, availableTier);
         validateTier(action, actionId, availableTier);
-        condition.ifPresent(c -> validateTier(c, conditionId.get(), availableTier));
+        validateTier(target, targetId, availableTier);
 
-        return new Command(trigger, action, condition);
+        validateHeightening(trigger, triggerId, availableTier);
+        validateHeightening(action, actionId, availableTier);
+        validateHeightening(target, targetId, availableTier);
+
+        return new Command(trigger, action, target);
     }
 
     private static <T extends TieredEntry> T getEntry(IForgeRegistry<T> registry, ResourceLocation id) {
@@ -43,15 +40,19 @@ public final class CommandBuilder {
         }
     }
 
-    /**
-     * Lists IDs from the given registry whose {@link TieredEntry#minTier()} is within the available tier.
-     */
+    private static void validateHeightening(TieredEntry entry, ResourceLocation id, int availableTier) {
+        if (entry.minHeightening() > availableTier) {
+            throw new CommandBuildException("Entry " + id + " requires heightening " + entry.minHeightening() + ", but available heightening is " + availableTier);
+        }
+    }
+
     public static <T extends TieredEntry> List<ResourceLocation> availableIds(IForgeRegistry<T> registry, int availableTier) {
         return registry.getKeys().stream()
                 .filter(id -> {
                     T entry = registry.getValue(id);
                     return entry != null && entry.minTier() <= availableTier;
                 })
+                .sorted(Comparator.comparing(ResourceLocation::toString))
                 .toList();
     }
 }

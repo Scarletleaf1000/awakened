@@ -5,4 +5,19 @@ package me.scarletleaf1000.awakened.command;
  */
 public interface Action extends TieredEntry {
     void execute(CommandContext ctx);
+
+    /**
+     * Returns true if this action should be stored as NBT on the item the player is holding,
+     * keeping the item in their inventory.
+     */
+    default boolean appliesToItem() {
+        return false;
+    }
+
+    /**
+     * Returns true if this action should transform the held item into an awakened item entity.
+     */
+    default boolean transformsToEntity() {
+        return false;
+    }
 }

@@ -14,7 +14,6 @@ import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.util.Optional;
 
 /**
  * In-game debug command that builds a sample Command from registry IDs and evaluates it.
@@ -35,7 +34,7 @@ public class CommandDebugCommand {
             Command command = CommandBuilder.build(
                     new ResourceLocation(Awakened.MOD_ID, "on_proximity"),
                     new ResourceLocation(Awakened.MOD_ID, "attack_target"),
-                    Optional.empty(),
+                    new ResourceLocation(Awakened.MOD_ID, "nearest_hostile"),
                     0
             );
             Entity executor = ctx.getSource().getEntityOrException();

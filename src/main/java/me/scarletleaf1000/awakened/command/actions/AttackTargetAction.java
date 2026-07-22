@@ -2,12 +2,19 @@ package me.scarletleaf1000.awakened.command.actions;
 
 import me.scarletleaf1000.awakened.command.Action;
 import me.scarletleaf1000.awakened.command.CommandContext;
+import net.minecraft.network.chat.Component;
 
-/**
- * Starter action: set the host's attack target and perform a melee attack.
- * Full AI/goal wiring is out of scope for this chunk.
- */
 public class AttackTargetAction implements Action {
+    @Override
+    public Component getDisplayName() {
+        return Component.literal("Attack Target");
+    }
+
+    @Override
+    public Component getDescription() {
+        return Component.literal("Orders the host to attack the selected target.");
+    }
+
     @Override
     public void execute(CommandContext ctx) {
         if (ctx.getTarget() != null) {

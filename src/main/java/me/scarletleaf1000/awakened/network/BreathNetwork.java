@@ -26,6 +26,8 @@ public class BreathNetwork {
                 VillagerTradeConfirmC2SPacket::new, VillagerTradeConfirmC2SPacket::handle);
         CHANNEL.registerMessage(id++, VillagerTradeResultS2CPacket.class, VillagerTradeResultS2CPacket::encode,
                 VillagerTradeResultS2CPacket::new, VillagerTradeResultS2CPacket::handle);
+        CHANNEL.registerMessage(id++, AwakeningCommandUseC2SPacket.class, AwakeningCommandUseC2SPacket::encode,
+                AwakeningCommandUseC2SPacket::new, AwakeningCommandUseC2SPacket::handle);
     }
 
     public static void sendToPlayer(ServerPlayer player, int breath) {
