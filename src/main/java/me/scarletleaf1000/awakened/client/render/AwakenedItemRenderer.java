@@ -1,7 +1,6 @@
 package me.scarletleaf1000.awakened.client.render;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Axis;
 import me.scarletleaf1000.awakened.entity.AwakenedItemEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -19,16 +18,15 @@ public class AwakenedItemRenderer extends EntityRenderer<AwakenedItemEntity> {
 
     public AwakenedItemRenderer(EntityRendererProvider.Context context) {
         super(context);
-        this.shadowRadius = 0.15f;
+        this.shadowRadius = 0.25f;
         this.shadowStrength = 0.75f;
     }
 
     @Override
     public void render(AwakenedItemEntity entity, float entityYaw, float partialTick, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         poseStack.pushPose();
-        poseStack.translate(0.0F, entity.getBbHeight() / 2.0F, 0.0F);
-        poseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-        poseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+        poseStack.translate(0.0F, entity.getBbHeight() / 2.0F + 0.1F, 0.0F);
+        poseStack.scale(2.0F, 2.0F, 2.0F);
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 entity.getItem(),
                 ItemDisplayContext.GROUND,

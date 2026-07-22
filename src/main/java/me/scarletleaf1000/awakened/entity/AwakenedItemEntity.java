@@ -8,6 +8,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
@@ -16,7 +17,6 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
@@ -39,6 +39,7 @@ public class AwakenedItemEntity extends ItemEntity {
 
     public AwakenedItemEntity(EntityType<? extends AwakenedItemEntity> type, Level level) {
         super(type, level);
+        this.setUnlimitedLifetime();
     }
 
     public void setCommandData(ResourceLocation triggerId, ResourceLocation actionId, ResourceLocation targetId, int storedBreath, UUID owner) {
@@ -93,20 +94,17 @@ public class AwakenedItemEntity extends ItemEntity {
 
     @Override
     public EntityDimensions getDimensions(Pose pose) {
-        if (isBlockItem()) {
-            return EntityDimensions.scalable(1.0f, 1.0f);
-        }
-        return EntityDimensions.scalable(0.75f, 0.75f);
+        return EntityDimensions.scalable(0.8f, 0.8f);
     }
 
     @Override
     public boolean canBeCollidedWith() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isPushable() {
-        return false;
+        return true;
     }
 
     @Override
@@ -121,24 +119,25 @@ public class AwakenedItemEntity extends ItemEntity {
 
     @Override
     public boolean hurt(DamageSource source, float amount) {
-        if (this.isRemoved()) {
+        if (this.isRemoved() || this.isInvulnerableTo(source)) {
             return false;
         }
+        if (amount <= 0.0F) {
+            return false;
+        }
+
+        if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
+            this.discard();
+            return true;
+        }
+
         this.markHurt();
         return true;
     }
 
     @Override
-    public void kill() {
-        // Awakened item entities cannot be killed by normal means.
-    }
-
-    @Override
     public void playerTouch(Player player) {
-        if (isBlockItem()) {
-            return;
-        }
-        super.playerTouch(player);
+        // Do not pick up the awakened entity by walking into it.
     }
 
     @Override
@@ -159,10 +158,6 @@ public class AwakenedItemEntity extends ItemEntity {
             return InteractionResult.sidedSuccess(this.level().isClientSide());
         }
 
-        if (!isBlockItem()) {
-            return super.interact(player, hand);
-        }
-
         return InteractionResult.PASS;
     }
 
@@ -172,9 +167,9 @@ public class AwakenedItemEntity extends ItemEntity {
         this.entityData.set(DATA_COMMAND, root);
     }
 
-    private boolean isBlockItem() {
-        ItemStack stack = this.getItem();
-        return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
+    @Override
+    public boolean fireImmune() {
+        return true;
     }
 
     @Override
