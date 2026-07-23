@@ -130,7 +130,7 @@ public class VillagerBreathTradeHandler {
 
         int total = 0;
         for (int base : baseCosts) {
-            total += Math.max(1, base - 8 * discountLevel);
+            total += Math.max(12, base - 8 * discountLevel);
         }
         return Math.min(MAX_TOTAL_COST, total);
     }
