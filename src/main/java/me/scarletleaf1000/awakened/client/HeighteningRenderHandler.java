@@ -490,7 +490,7 @@ public class HeighteningRenderHandler {
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
             if (isFoilRenderType(renderType)) {
-                return delegate.getBuffer(renderType);
+                return NoopVertexConsumer.INSTANCE;
             }
             RenderType desaturated = cache.computeIfAbsent(renderType, DesaturatedRenderType::new);
             return delegate.getBuffer(desaturated);
