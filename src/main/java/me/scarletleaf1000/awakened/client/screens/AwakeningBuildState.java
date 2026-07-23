@@ -1,5 +1,6 @@
 package me.scarletleaf1000.awakened.client.screens;
 
+import me.scarletleaf1000.awakened.command.SpecialCommand;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
@@ -8,6 +9,7 @@ import java.util.EnumMap;
 
 public class AwakeningBuildState {
     private final EnumMap<AwakeningComponentType, ResourceLocation> selections = new EnumMap<>(AwakeningComponentType.class);
+    private SpecialCommand specialCommand;
 
     public void set(AwakeningComponentType type, ResourceLocation id) {
         selections.put(type, id);
@@ -15,6 +17,14 @@ public class AwakeningBuildState {
 
     public ResourceLocation get(AwakeningComponentType type) {
         return selections.get(type);
+    }
+
+    public void setSpecialCommand(SpecialCommand specialCommand) {
+        this.specialCommand = specialCommand;
+    }
+
+    public SpecialCommand getSpecialCommand() {
+        return specialCommand;
     }
 
     public boolean isComplete() {

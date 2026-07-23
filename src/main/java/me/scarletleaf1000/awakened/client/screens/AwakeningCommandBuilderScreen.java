@@ -49,10 +49,10 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         }
 
         int specialY = startY + AwakeningComponentType.values().length * spacing + 4;
-        Button specialButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.special_commands"), b -> {})
+        Button specialButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.special_commands"), b -> Minecraft.getInstance().setScreen(new SpecialCommandSelectionScreen(this, this.buildState)))
                 .bounds(buttonX, specialY, buttonWidth, 20)
                 .build();
-        specialButton.active = false;
+        specialButton.active = true;
         this.addWidgetWithDescription(specialButton, Component.translatable("gui.awakened.command_builder.button.special_commands.description"));
 
         int summaryY = specialY + 20 + 20;
@@ -64,7 +64,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         this.useCommandButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.use_command"), b -> useCommand())
                 .bounds(this.leftPos + (this.imageWidth - 100) / 2, useButtonY, 100, 20)
                 .build();
-        this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid();
+        this.useCommandButton.active = (this.buildState.getSpecialCommand() != null || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
         this.addWidgetWithDescription(this.useCommandButton, getUseCommandDescription());
     }
 
@@ -89,6 +89,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
                 builder.append(" ");
             }
             builder.append(getComponentName(type, getEffectiveId(type)).getString());
+        }
+        if (this.buildState.getSpecialCommand() != null) {
+            return this.buildState.getSpecialCommand().getDisplayName();
         }
         return Component.translatable("gui.awakened.command_builder.summary", builder.toString(), getTotalCost(), getRequiredHeightening());
     }
@@ -172,6 +175,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getUseCommandDescription() {
+        if (this.buildState.getSpecialCommand() != null) {
+            return Component.translatable("gui.awakened.special.my_breath_to_yours.use.description");
+        }
         Component itemError = getHeldItemError();
         if (itemError != null) {
             return itemError;
@@ -214,6 +220,10 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private void useCommand() {
+        if (this.buildState.getSpecialCommand() != null) {
+            Minecraft.getInstance().setScreen(new BreathTransferTargetScreen(this));
+            return;
+        }
         if (!this.buildState.isComplete() || !isHeldItemValid()) {
             return;
         }
@@ -279,7 +289,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     public void tick() {
         super.tick();
         if (this.useCommandButton != null) {
-            this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid();
+            this.useCommandButton.active = (this.buildState.getSpecialCommand() != null || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
             this.descriptions.put(this.useCommandButton, getUseCommandDescription());
         }
     }
