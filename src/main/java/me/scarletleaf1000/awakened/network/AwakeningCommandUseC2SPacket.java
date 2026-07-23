@@ -2,11 +2,13 @@ package me.scarletleaf1000.awakened.network;
 
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.command.Command;
-import me.scarletleaf1000.awakened.command.CommandBuilder;
 import me.scarletleaf1000.awakened.command.CommandBuildException;
+import me.scarletleaf1000.awakened.command.CommandBuilder;
 import me.scarletleaf1000.awakened.command.CommandContext;
+import me.scarletleaf1000.awakened.command.actions.ItemStatAction;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
+import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
@@ -16,8 +18,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Supplier;
 
 public class AwakeningCommandUseC2SPacket {
@@ -53,14 +53,21 @@ public class AwakeningCommandUseC2SPacket {
                 int tier = Heightening.fromBreath(breath.getBreath()).ordinal();
                 try {
                     Command command = CommandBuilder.build(triggerId, actionId, targetId, tier);
-
                     int storedBreath = command.trigger().cost() + command.action().cost() + command.target().cost();
 
                     if (command.action().appliesToItem()) {
                         ItemStack held = player.getMainHandItem();
-                        if (!held.isEmpty()) {
-                            AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
+                        if (!(command.action() instanceof ItemStatAction itemAction) || held.isEmpty() || held.getCount() != 1 || AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.invalid_item"));
                         }
+                        if (!itemAction.canApplyTo(held)) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.invalid_item_for_action", itemAction.getDisplayName()));
+                        }
+                        if (breath.getBreath() < storedBreath) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.insufficient_breath", storedBreath));
+                        }
+                        breath.removeBreath(storedBreath);
+                        AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
                     } else {
                         CommandContext commandCtx = new CommandContext(player, player.level());
                         command.evaluateAndExecute(commandCtx);
@@ -85,7 +92,7 @@ public class AwakeningCommandUseC2SPacket {
     private static Component getCommandName(Command command) {
         MutableComponent commandName = Component.empty();
         boolean first = true;
-        Component[] parts = { command.trigger().getDisplayName(), command.action().getDisplayName(), command.target().getDisplayName() };
+        Component[] parts = {command.trigger().getDisplayName(), command.action().getDisplayName(), command.target().getDisplayName()};
         for (Component part : parts) {
             if (part == null || part.getString().isBlank()) {
                 continue;
@@ -98,5 +105,4 @@ public class AwakeningCommandUseC2SPacket {
         }
         return commandName;
     }
-
 }

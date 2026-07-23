@@ -1,7 +1,7 @@
 package me.scarletleaf1000.awakened.command;
 
 import me.scarletleaf1000.awakened.Awakened;
-import me.scarletleaf1000.awakened.command.actions.PlaceholderItemAction;
+import me.scarletleaf1000.awakened.command.actions.ItemStatAction;
 import me.scarletleaf1000.awakened.command.targets.NoTarget;
 import me.scarletleaf1000.awakened.command.triggers.PassiveTrigger;
 import net.minecraft.resources.ResourceLocation;
@@ -25,17 +25,19 @@ public class CommandRegistries {
     public static final Supplier<IForgeRegistry<Target>> TARGET_REGISTRY = TARGETS.makeRegistry(RegistryBuilder::new);
 
     public static final RegistryObject<Trigger> PASSIVE = TRIGGERS.register("passive", PassiveTrigger::new);
-    public static final RegistryObject<Action> HARDEN = ACTIONS.register("harden", () -> new PlaceholderItemAction("action.awakened.harden", 10, 2));
-    public static final RegistryObject<Action> RESIST = ACTIONS.register("resist", () -> new PlaceholderItemAction("action.awakened.resist", 100, 5));
-    public static final RegistryObject<Action> PERSIST = ACTIONS.register("persist", () -> new PlaceholderItemAction("action.awakened.persist", 300, 8));
-    public static final RegistryObject<Action> BECOME_ETERNAL = ACTIONS.register("become_eternal", () -> new PlaceholderItemAction("action.awakened.become_eternal", 1000, 9));
-    public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new PlaceholderItemAction("action.awakened.harm", 20, 2));
-    public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new PlaceholderItemAction("action.awakened.wound", 200, 4));
-    public static final RegistryObject<Action> DESTROY = ACTIONS.register("destroy", () -> new PlaceholderItemAction("action.awakened.destroy", 500, 8));
-    public static final RegistryObject<Action> REACH = ACTIONS.register("reach", () -> new PlaceholderItemAction("action.awakened.reach", 200, 4));
-    public static final RegistryObject<Action> DEFEND = ACTIONS.register("defend", () -> new PlaceholderItemAction("action.awakened.defend", 50, 3));
-    public static final RegistryObject<Action> WARD = ACTIONS.register("ward", () -> new PlaceholderItemAction("action.awakened.ward", 200, 5));
-    public static final RegistryObject<Action> PROTECT = ACTIONS.register("protect", () -> new PlaceholderItemAction("action.awakened.protect", 500, 8));
+    public static final RegistryObject<Action> HARDEN = ACTIONS.register("harden", () -> new ItemStatAction("action.awakened.harden", 10, 2, ItemStatAction.Effect.DURABILITY, 0.20D));
+    public static final RegistryObject<Action> RESIST = ACTIONS.register("resist", () -> new ItemStatAction("action.awakened.resist", 100, 5, ItemStatAction.Effect.DURABILITY, 0.40D));
+    public static final RegistryObject<Action> PERSIST = ACTIONS.register("persist", () -> new ItemStatAction("action.awakened.persist", 300, 8, ItemStatAction.Effect.DURABILITY, 0.65D));
+    public static final RegistryObject<Action> BECOME_ETERNAL = ACTIONS.register("become_eternal", () -> new ItemStatAction("action.awakened.become_eternal", 1000, 9, ItemStatAction.Effect.UNBREAKABLE, 0));
+    public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new ItemStatAction("action.awakened.harm", 20, 2, ItemStatAction.Effect.DAMAGE, 0.10D));
+    public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new ItemStatAction("action.awakened.wound", 200, 4, ItemStatAction.Effect.DAMAGE, 0.40D));
+    public static final RegistryObject<Action> DESTROY = ACTIONS.register("destroy", () -> new ItemStatAction("action.awakened.destroy", 500, 8, ItemStatAction.Effect.DAMAGE, 1.00D));
+    public static final RegistryObject<Action> REACH = ACTIONS.register("reach", () -> new ItemStatAction("action.awakened.reach", 200, 4, ItemStatAction.Effect.REACH, 1.0D));
+    public static final RegistryObject<Action> DEFEND = ACTIONS.register("defend", () -> new ItemStatAction("action.awakened.defend", 50, 3, ItemStatAction.Effect.ARMOR, 2.0D));
+    public static final RegistryObject<Action> WARD = ACTIONS.register("ward", () -> new ItemStatAction("action.awakened.ward", 200, 5, ItemStatAction.Effect.ARMOR, 4.0D));
+    public static final RegistryObject<Action> PROTECT = ACTIONS.register("protect", () -> new ItemStatAction("action.awakened.protect", 500, 8, ItemStatAction.Effect.ARMOR, 8.0D));
+    public static final RegistryObject<Action> JUMP = ACTIONS.register("jump", () -> new ItemStatAction("action.awakened.jump", 50, 3, ItemStatAction.Effect.JUMP, 1.5D));
+    public static final RegistryObject<Action> LAUNCH = ACTIONS.register("launch", () -> new ItemStatAction("action.awakened.launch", 150, 5, ItemStatAction.Effect.JUMP, 3.0D));
     public static final ResourceLocation NO_TARGET_ID = new ResourceLocation(Awakened.MOD_ID, "no_target");
     public static final RegistryObject<Target> NO_TARGET = TARGETS.register(NO_TARGET_ID.getPath(), NoTarget::new);
 

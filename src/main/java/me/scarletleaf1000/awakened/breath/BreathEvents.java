@@ -3,6 +3,7 @@ package me.scarletleaf1000.awakened.breath;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
+import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import net.minecraft.server.level.ServerPlayer;
@@ -154,16 +155,20 @@ public class BreathEvents {
             return;
         }
         ItemStack stack = event.getItemStack();
-        if (!ItemBreathStorage.hasStoredBreath(stack)) {
-            return;
+        if (AwakenedItemData.isAwakened(stack)) {
+            if (!player.getUUID().equals(AwakenedItemData.getOwner(stack))) {
+                return;
+            }
+            int breath = AwakenedItemData.remove(stack);
+            player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+        } else {
+            if (!ItemBreathStorage.hasStoredBreath(stack) || !ItemBreathStorage.isOwnerOrPublic(stack, player)) {
+                return;
+            }
+            int breath = ItemBreathStorage.getStoredBreath(stack);
+            player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+            ItemBreathStorage.removeStoredBreath(stack);
         }
-        if (!ItemBreathStorage.isOwnerOrPublic(stack, player)) {
-            return;
-        }
-
-        int breath = ItemBreathStorage.getStoredBreath(stack);
-        player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
-        ItemBreathStorage.removeStoredBreath(stack);
 
         event.setCanceled(true);
         event.setCancellationResult(InteractionResult.sidedSuccess(event.getLevel().isClientSide()));
