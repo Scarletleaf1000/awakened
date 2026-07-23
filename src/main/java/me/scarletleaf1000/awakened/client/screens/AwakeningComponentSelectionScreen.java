@@ -72,7 +72,9 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
         return switch (this.componentType) {
             case TRIGGER -> CommandBuilder.availableIds(CommandRegistries.TRIGGER_REGISTRY.get(), availableTier);
             case ACTION -> CommandBuilder.availableIds(CommandRegistries.ACTION_REGISTRY.get(), availableTier);
-            case TARGET -> CommandBuilder.availableIds(CommandRegistries.TARGET_REGISTRY.get(), availableTier);
+            case TARGET -> CommandBuilder.availableIds(CommandRegistries.TARGET_REGISTRY.get(), availableTier).stream()
+                    .filter(id -> !id.equals(CommandRegistries.NO_TARGET_ID))
+                    .toList();
         };
     }
 

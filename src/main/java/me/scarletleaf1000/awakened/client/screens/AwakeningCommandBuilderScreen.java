@@ -2,6 +2,7 @@ package me.scarletleaf1000.awakened.client.screens;
 
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
+import me.scarletleaf1000.awakened.command.Action;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
 import me.scarletleaf1000.awakened.command.TieredEntry;
 import me.scarletleaf1000.awakened.heightening.Heightening;
@@ -40,6 +41,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             Button button = Button.builder(getComponentButtonLabel(type), b -> openSelectionScreen(type))
                     .bounds(buttonX, startY + i * spacing, buttonWidth, 20)
                     .build();
+            button.active = type != AwakeningComponentType.TARGET || isTargetUsed();
             this.addWidgetWithDescription(button, getComponentButtonDescription(type));
         }
 
@@ -64,6 +66,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getComponentButtonLabel(AwakeningComponentType type) {
+        if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
+            return Component.literal(type.displayName() + ": N/A");
+        }
         ResourceLocation id = getEffectiveId(type);
         String value = id == null ? "None" : getComponentName(type, id).getString();
         return Component.literal(type.displayName() + ": " + value);
@@ -72,6 +77,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private Component getSummaryComponent() {
         StringBuilder builder = new StringBuilder();
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
+            if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
+                continue;
+            }
             if (builder.length() > 0) {
                 builder.append(" ");
             }
@@ -99,6 +107,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getComponentButtonDescription(AwakeningComponentType type) {
+        if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
+            return Component.literal("No target is required for this action.");
+        }
         ResourceLocation id = getEffectiveId(type);
         StringBuilder builder = new StringBuilder(type.description());
         if (id != null) {
@@ -114,6 +125,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private int getTotalCost() {
         int cost = 0;
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
+            if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
+                continue;
+            }
             ResourceLocation id = getEffectiveId(type);
             if (id != null) {
                 TieredEntry entry = getComponentEntry(type, id);
@@ -128,6 +142,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private int getRequiredHeightening() {
         int required = 0;
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
+            if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
+                continue;
+            }
             ResourceLocation id = getEffectiveId(type);
             if (id != null) {
                 TieredEntry entry = getComponentEntry(type, id);
@@ -170,9 +187,23 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             return;
         }
         ResourceLocation triggerId = getEffectiveId(AwakeningComponentType.TRIGGER);
-        ResourceLocation targetId = getEffectiveId(AwakeningComponentType.TARGET);
+        ResourceLocation targetId = isTargetUsed()
+                ? getEffectiveId(AwakeningComponentType.TARGET)
+                : CommandRegistries.NO_TARGET_ID;
         BreathNetwork.CHANNEL.sendToServer(new AwakeningCommandUseC2SPacket(triggerId, actionId, targetId));
         Minecraft.getInstance().setScreen(null);
+    }
+
+    private boolean isTargetUsed() {
+        ResourceLocation actionId = this.buildState.get(AwakeningComponentType.ACTION);
+        if (actionId == null) {
+            return false;
+        }
+        TieredEntry entry = getComponentEntry(AwakeningComponentType.ACTION, actionId);
+        if (!(entry instanceof Action action)) {
+            return false;
+        }
+        return action.usesTarget();
     }
 
     private ResourceLocation getEffectiveId(AwakeningComponentType type) {
@@ -182,7 +213,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         }
         return switch (type) {
             case TRIGGER -> new ResourceLocation(Awakened.MOD_ID, "passive");
-            case TARGET -> new ResourceLocation(Awakened.MOD_ID, "nearest_entity");
+            case TARGET -> new ResourceLocation(Awakened.MOD_ID, "self");
             case ACTION -> null;
         };
     }

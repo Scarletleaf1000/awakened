@@ -15,6 +15,8 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class AwakeningCommandUseC2SPacket {
@@ -81,9 +83,17 @@ public class AwakeningCommandUseC2SPacket {
     }
 
     private static String getCommandName(Command command) {
-        return command.trigger().getDisplayName().getString() + " "
-                + command.action().getDisplayName().getString() + " "
-                + command.target().getDisplayName().getString();
+        List<String> parts = new ArrayList<>();
+        addIfNotBlank(parts, command.trigger().getDisplayName().getString());
+        addIfNotBlank(parts, command.action().getDisplayName().getString());
+        addIfNotBlank(parts, command.target().getDisplayName().getString());
+        return String.join(" ", parts);
+    }
+
+    private static void addIfNotBlank(List<String> parts, String part) {
+        if (part != null && !part.isBlank()) {
+            parts.add(part);
+        }
     }
 
 }

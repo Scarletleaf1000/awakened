@@ -14,4 +14,11 @@ public interface Action extends TieredEntry {
         return false;
     }
 
+    /**
+     * Returns true if this action makes use of a target selection.
+     */
+    default boolean usesTarget() {
+        return true;
+    }
+
 }
