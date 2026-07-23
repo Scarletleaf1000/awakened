@@ -3,6 +3,8 @@ package me.scarletleaf1000.awakened;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
@@ -53,6 +55,8 @@ public class Awakened {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     // Create a Deferred Register to hold MenuTypes
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
+
+    public static final TagKey<Item> AWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "awakenable"));
 
     public static final RegistryObject<MenuType<VillagerBreathTradeMenu>> VILLAGER_BREATH_TRADE_MENU =
             MENU_TYPES.register("villager_breath_trade", () -> IForgeMenuType.create(VillagerBreathTradeMenu::new));

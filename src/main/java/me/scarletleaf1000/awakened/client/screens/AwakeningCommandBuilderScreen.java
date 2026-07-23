@@ -14,6 +14,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 
 public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Awakened.MOD_ID, "textures/gui/container/awakening_small.png");
@@ -63,8 +64,8 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         this.useCommandButton = Button.builder(Component.literal("Use Command"), b -> useCommand())
                 .bounds(this.leftPos + (this.imageWidth - 100) / 2, useButtonY, 100, 20)
                 .build();
-        this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening();
-        this.addWidgetWithDescription(this.useCommandButton, Component.literal("Activate the assembled command.\nCost: " + getTotalCost() + " | Requires Heightening: " + getRequiredHeightening()));
+        this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid();
+        this.addWidgetWithDescription(this.useCommandButton, getUseCommandDescription());
     }
 
     private Component getComponentButtonLabel(AwakeningComponentType type) {
@@ -168,6 +169,36 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
                 .orElse(0);
     }
 
+    private Component getUseCommandDescription() {
+        Component itemError = getHeldItemError();
+        if (itemError != null) {
+            return itemError;
+        }
+        if (getAvailableHeightening() < getRequiredHeightening()) {
+            return Component.literal("Requires Heightening: " + getRequiredHeightening());
+        }
+        return Component.literal("Activate the assembled command.\nCost: " + getTotalCost() + " | Requires Heightening: " + getRequiredHeightening());
+    }
+
+    private boolean isHeldItemValid() {
+        return getHeldItemError() == null;
+    }
+
+    private Component getHeldItemError() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
+            return Component.literal("Requires a non-stackable item in your main hand.");
+        }
+        ItemStack held = mc.player.getMainHandItem();
+        if (held.isEmpty() || held.getMaxStackSize() != 1) {
+            return Component.literal("Requires a non-stackable item in your main hand.");
+        }
+        if (held.is(Awakened.AWAKENABLE_TAG) || getAvailableHeightening() >= Heightening.NINTH.ordinal()) {
+            return null;
+        }
+        return Component.literal("You are not strong enough to awaken items that were not once alive");
+    }
+
     private TieredEntry getComponentEntry(AwakeningComponentType type, ResourceLocation id) {
         return switch (type) {
             case TRIGGER -> CommandRegistries.TRIGGER_REGISTRY.get().getValue(id);
@@ -181,7 +212,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private void useCommand() {
-        if (!this.buildState.isComplete()) {
+        if (!this.buildState.isComplete() || !isHeldItemValid()) {
             return;
         }
         ResourceLocation actionId = getEffectiveId(AwakeningComponentType.ACTION);
@@ -240,6 +271,15 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             return selectedTriggerId;
         }
         return new ResourceLocation(Awakened.MOD_ID, "passive");
+    }
+
+    @Override
+    public void tick() {
+        super.tick();
+        if (this.useCommandButton != null) {
+            this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid();
+            this.descriptions.put(this.useCommandButton, getUseCommandDescription());
+        }
     }
 
     @Override
