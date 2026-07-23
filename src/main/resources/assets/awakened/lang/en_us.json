@@ -1,4 +1,7 @@
 {
   "key.categories.awakened": "Awakened",
-  "key.awakened.open_awakening": "Open Awakening GUI"
+  "key.awakened.open_awakening": "Open Awakening GUI",
+  "item.awakened.wood_doll": "Wooden Doll",
+  "item.awakened.straw_doll": "Straw Doll",
+  "item.awakened.rope_coil": "Coil of Rope"
 }

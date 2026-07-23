@@ -58,6 +58,10 @@ public class Awakened {
 
     public static final TagKey<Item> AWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "awakenable"));
 
+    public static final RegistryObject<Item> WOOD_DOLL = ITEMS.register("wood_doll", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> STRAW_DOLL = ITEMS.register("straw_doll", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> ROPE_COIL = ITEMS.register("rope_coil", () -> new Item(new Item.Properties().stacksTo(1)));
+
     public static final RegistryObject<MenuType<VillagerBreathTradeMenu>> VILLAGER_BREATH_TRADE_MENU =
             MENU_TYPES.register("villager_breath_trade", () -> IForgeMenuType.create(VillagerBreathTradeMenu::new));
 
