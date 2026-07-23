@@ -180,7 +180,7 @@ public class HeighteningRenderHandler {
             return;
         }
 
-        int breath = ClientBreathData.get(target.getId());
+        int breath = target == mc.player ? ownBreath : ClientBreathData.get(target.getId());
         Heightening heightening = Heightening.fromBreath(breath);
         String text = heightening.getDisplayName();
 

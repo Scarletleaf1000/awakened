@@ -3,10 +3,7 @@ package me.scarletleaf1000.awakened.command;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.command.actions.AttackTargetAction;
 import me.scarletleaf1000.awakened.command.actions.FollowOwnerAction;
-import me.scarletleaf1000.awakened.command.actions.SummonEntityAction;
-import me.scarletleaf1000.awakened.command.targets.InteractingEntityTarget;
 import me.scarletleaf1000.awakened.command.targets.NearestHostileTarget;
-import me.scarletleaf1000.awakened.command.triggers.OnInteractTrigger;
 import me.scarletleaf1000.awakened.command.triggers.OnProximityTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -29,13 +26,8 @@ public class CommandRegistries {
     public static final Supplier<IForgeRegistry<Target>> TARGET_REGISTRY = TARGETS.makeRegistry(RegistryBuilder::new);
 
     public static final RegistryObject<Trigger> ON_PROXIMITY = TRIGGERS.register("on_proximity", OnProximityTrigger::new);
-    public static final RegistryObject<Trigger> ON_INTERACT = TRIGGERS.register("on_interact", OnInteractTrigger::new);
-
     public static final RegistryObject<Action> FOLLOW_OWNER = ACTIONS.register("follow_owner", FollowOwnerAction::new);
     public static final RegistryObject<Action> ATTACK_TARGET = ACTIONS.register("attack_target", AttackTargetAction::new);
-    public static final RegistryObject<Action> SUMMON_ENTITY = ACTIONS.register("summon_entity", SummonEntityAction::new);
-
-    public static final RegistryObject<Target> INTERACTING_ENTITY = TARGETS.register("interacting_entity", InteractingEntityTarget::new);
     public static final RegistryObject<Target> NEAREST_HOSTILE = TARGETS.register("nearest_hostile", NearestHostileTarget::new);
 
     public static void register(IEventBus bus) {

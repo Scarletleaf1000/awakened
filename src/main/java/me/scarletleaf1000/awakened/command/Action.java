@@ -14,10 +14,4 @@ public interface Action extends TieredEntry {
         return false;
     }
 
-    /**
-     * Returns true if this action should transform the held item into an awakened item entity.
-     */
-    default boolean transformsToEntity() {
-        return false;
-    }
 }
