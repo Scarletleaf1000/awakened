@@ -27,9 +27,7 @@ public class AwakenedItemRenderer extends EntityRenderer<AwakenedItemEntity> {
         poseStack.pushPose();
         poseStack.translate(0.0F, entity.getBbHeight() / 2.0F + 0.1F, 0.0F);
 
-        boolean block = entity.getItem().getItem() instanceof net.minecraft.world.item.BlockItem;
-        float scale = block ? 2.5F : 2.0F;
-        poseStack.scale(scale, scale, scale);
+        poseStack.scale(2.0F, 2.0F, 2.0F);
 
         Minecraft.getInstance().getItemRenderer().renderStatic(
                 entity.getItem(),

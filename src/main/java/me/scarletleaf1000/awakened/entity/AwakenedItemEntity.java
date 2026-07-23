@@ -8,19 +8,15 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.tags.DamageTypeTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityDimensions;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.Pose;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.phys.Vec3;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -28,8 +24,10 @@ import java.util.UUID;
 /**
  * A physical awakened item. Looks like the item it was created from and stores the
  * command used to awaken it, the breath invested, and the original owner.
+ *
+ * This is a stripped scaffold; behavior is being rebuilt from the ground up.
  */
-public class AwakenedItemEntity extends ItemEntity {
+public class AwakenedItemEntity extends Entity {
     public static final String TAG_ROOT = "AwakenedCommand";
     public static final String TAG_TRIGGER = "Trigger";
     public static final String TAG_ACTION = "Action";
@@ -37,11 +35,12 @@ public class AwakenedItemEntity extends ItemEntity {
     public static final String TAG_BREATH = "StoredBreath";
     public static final String TAG_OWNER = "OwnerUUID";
 
+    private static final EntityDataAccessor<ItemStack> DATA_ITEM = SynchedEntityData.defineId(AwakenedItemEntity.class, EntityDataSerializers.ITEM_STACK);
     private static final EntityDataAccessor<CompoundTag> DATA_COMMAND = SynchedEntityData.defineId(AwakenedItemEntity.class, EntityDataSerializers.COMPOUND_TAG);
 
     public AwakenedItemEntity(EntityType<? extends AwakenedItemEntity> type, Level level) {
         super(type, level);
-        this.setUnlimitedLifetime();
+        this.setInvulnerable(true);
     }
 
     public void setCommandData(ResourceLocation triggerId, ResourceLocation actionId, ResourceLocation targetId, int storedBreath, UUID owner) {
@@ -88,27 +87,18 @@ public class AwakenedItemEntity extends ItemEntity {
         return root.getUUID(TAG_OWNER);
     }
 
-    @Override
+    public ItemStack getItem() {
+        return this.entityData.get(DATA_ITEM);
+    }
+
     public void setItem(ItemStack stack) {
-        super.setItem(stack);
+        this.entityData.set(DATA_ITEM, stack.copy());
         this.refreshDimensions();
     }
 
     @Override
     public EntityDimensions getDimensions(Pose pose) {
-        return isBlockItem()
-                ? EntityDimensions.scalable(1.0f, 1.0f)
-                : EntityDimensions.scalable(0.8f, 0.8f);
-    }
-
-    @Override
-    public boolean canBeCollidedWith() {
-        return isBlockItem();
-    }
-
-    @Override
-    public boolean isPushable() {
-        return isBlockItem();
+        return EntityDimensions.scalable(1.0f, 1.0f);
     }
 
     @Override
@@ -118,40 +108,17 @@ public class AwakenedItemEntity extends ItemEntity {
 
     @Override
     public boolean isAttackable() {
-        return true;
-    }
-
-    @Override
-    public boolean hurt(DamageSource source, float amount) {
-        if (this.isRemoved() || this.isInvulnerableTo(source)) {
-            return false;
-        }
-        if (amount <= 0.0F) {
-            return false;
-        }
-
-        if (source.is(DamageTypeTags.BYPASSES_INVULNERABILITY)) {
-            this.discard();
-            return true;
-        }
-
-        if (source.getEntity() instanceof Player player) {
-            this.markHurt();
-            Vec3 push = this.position().subtract(player.position());
-            push = new Vec3(push.x, 0.0, push.z);
-            if (push.lengthSqr() < 1.0E-4) {
-                push = new Vec3(0.0, 0.0, 1.0);
-            }
-            push = push.normalize().scale(0.35).add(0.0, 0.18, 0.0);
-            this.setDeltaMovement(this.getDeltaMovement().add(push));
-        }
-
         return false;
     }
 
     @Override
+    public boolean fireImmune() {
+        return true;
+    }
+
+    @Override
     public void playerTouch(Player player) {
-        // Do not pick up the awakened entity by walking into it.
+        // Awakened items cannot be collected by walking into them.
     }
 
     @Override
@@ -175,31 +142,18 @@ public class AwakenedItemEntity extends ItemEntity {
         return InteractionResult.PASS;
     }
 
-    public void setStoredBreath(int amount) {
-        CompoundTag root = getCommandData();
-        root.putInt(TAG_BREATH, Math.max(0, amount));
-        this.entityData.set(DATA_COMMAND, root);
-    }
-
-    private boolean isBlockItem() {
-        ItemStack stack = this.getItem();
-        return !stack.isEmpty() && stack.getItem() instanceof BlockItem;
-    }
-
-    @Override
-    public boolean fireImmune() {
-        return true;
-    }
-
     @Override
     protected void defineSynchedData() {
-        super.defineSynchedData();
+        this.entityData.define(DATA_ITEM, ItemStack.EMPTY);
         this.entityData.define(DATA_COMMAND, new CompoundTag());
     }
 
     @Override
-    public void addAdditionalSaveData(CompoundTag compound) {
-        super.addAdditionalSaveData(compound);
+    protected void addAdditionalSaveData(CompoundTag compound) {
+        ItemStack item = this.getItem();
+        if (!item.isEmpty()) {
+            compound.put("Item", item.save(new CompoundTag()));
+        }
         CompoundTag root = getCommandData();
         if (root != null && !root.isEmpty()) {
             compound.put(TAG_ROOT, root.copy());
@@ -207,11 +161,22 @@ public class AwakenedItemEntity extends ItemEntity {
     }
 
     @Override
-    public void readAdditionalSaveData(CompoundTag compound) {
-        super.readAdditionalSaveData(compound);
+    protected void readAdditionalSaveData(CompoundTag compound) {
+        if (compound.contains("Item", CompoundTag.TAG_COMPOUND)) {
+            this.setItem(ItemStack.of(compound.getCompound("Item")));
+        }
         if (compound.contains(TAG_ROOT, CompoundTag.TAG_COMPOUND)) {
             this.entityData.set(DATA_COMMAND, compound.getCompound(TAG_ROOT));
         }
+    }
+
+    @Override
+    public void tick() {
+        if (this.getItem().isEmpty()) {
+            this.discard();
+            return;
+        }
+        super.tick();
     }
 
     @Nullable
