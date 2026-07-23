@@ -1,10 +1,16 @@
 package me.scarletleaf1000.awakened.command.actions;
 
 import me.scarletleaf1000.awakened.command.Action;
+import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandContext;
 import net.minecraft.network.chat.Component;
 
 public class AttackTargetAction implements Action {
+    @Override
+    public ActionType getActionType() {
+        return ActionType.ENTITY;
+    }
+
     @Override
     public Component getDisplayName() {
         return Component.literal("Attack Target");

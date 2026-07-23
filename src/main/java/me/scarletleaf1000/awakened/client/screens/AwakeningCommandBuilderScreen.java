@@ -3,8 +3,10 @@ package me.scarletleaf1000.awakened.client.screens;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.command.Action;
+import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
 import me.scarletleaf1000.awakened.command.TieredEntry;
+import me.scarletleaf1000.awakened.command.Trigger;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.network.AwakeningCommandUseC2SPacket;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
@@ -195,27 +197,49 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private boolean isTargetUsed() {
+        return getSelectedActionType() == ActionType.ENTITY;
+    }
+
+    private ActionType getSelectedActionType() {
         ResourceLocation actionId = this.buildState.get(AwakeningComponentType.ACTION);
         if (actionId == null) {
-            return false;
+            return null;
         }
         TieredEntry entry = getComponentEntry(AwakeningComponentType.ACTION, actionId);
         if (!(entry instanceof Action action)) {
-            return false;
+            return null;
         }
-        return action.usesTarget();
+        return action.getActionType();
     }
 
     private ResourceLocation getEffectiveId(AwakeningComponentType type) {
         ResourceLocation id = this.buildState.get(type);
         if (id != null) {
-            return id;
+            if (type != AwakeningComponentType.TRIGGER) {
+                return id;
+            }
+            return getCompatibleTriggerId(id);
         }
         return switch (type) {
             case TRIGGER -> new ResourceLocation(Awakened.MOD_ID, "passive");
             case TARGET -> new ResourceLocation(Awakened.MOD_ID, "self");
             case ACTION -> null;
         };
+    }
+
+    private ResourceLocation getCompatibleTriggerId(ResourceLocation selectedTriggerId) {
+        if (selectedTriggerId == null) {
+            return new ResourceLocation(Awakened.MOD_ID, "passive");
+        }
+        ActionType actionType = getSelectedActionType();
+        if (actionType == null) {
+            return selectedTriggerId;
+        }
+        Trigger trigger = (Trigger) getComponentEntry(AwakeningComponentType.TRIGGER, selectedTriggerId);
+        if (trigger != null && trigger.getSupportedActionTypes().contains(actionType)) {
+            return selectedTriggerId;
+        }
+        return new ResourceLocation(Awakened.MOD_ID, "passive");
     }
 
     @Override

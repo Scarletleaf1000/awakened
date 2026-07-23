@@ -7,6 +7,11 @@ public interface Action extends TieredEntry {
     void execute(CommandContext ctx);
 
     /**
+     * Returns whether this action is for an item or an entity.
+     */
+    ActionType getActionType();
+
+    /**
      * Returns true if this action should be stored as NBT on the item the player is holding,
      * keeping the item in their inventory.
      */
@@ -18,7 +23,7 @@ public interface Action extends TieredEntry {
      * Returns true if this action makes use of a target selection.
      */
     default boolean usesTarget() {
-        return true;
+        return getActionType() == ActionType.ENTITY;
     }
 
 }

@@ -7,6 +7,7 @@ import me.scarletleaf1000.awakened.command.CommandRegistries;
 import me.scarletleaf1000.awakened.command.Target;
 import me.scarletleaf1000.awakened.command.TieredEntry;
 import me.scarletleaf1000.awakened.command.Action;
+import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.Trigger;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import net.minecraft.client.Minecraft;
@@ -65,17 +66,61 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
 
     private void select(ResourceLocation id) {
         this.buildState.set(this.componentType, id);
+        if (this.componentType == AwakeningComponentType.ACTION) {
+            updateCompatibilityForAction(id);
+        }
         Minecraft.getInstance().setScreen(this.parent);
     }
 
     private List<ResourceLocation> getAvailableIds(int availableTier) {
         return switch (this.componentType) {
-            case TRIGGER -> CommandBuilder.availableIds(CommandRegistries.TRIGGER_REGISTRY.get(), availableTier);
+            case TRIGGER -> {
+                List<ResourceLocation> ids = CommandBuilder.availableIds(CommandRegistries.TRIGGER_REGISTRY.get(), availableTier);
+                ActionType actionType = getSelectedActionType();
+                if (actionType != null) {
+                    ids = ids.stream()
+                            .filter(id -> {
+                                Trigger trigger = CommandRegistries.TRIGGER_REGISTRY.get().getValue(id);
+                                return trigger != null && trigger.getSupportedActionTypes().contains(actionType);
+                            })
+                            .toList();
+                }
+                yield ids;
+            }
             case ACTION -> CommandBuilder.availableIds(CommandRegistries.ACTION_REGISTRY.get(), availableTier);
             case TARGET -> CommandBuilder.availableIds(CommandRegistries.TARGET_REGISTRY.get(), availableTier).stream()
                     .filter(id -> !id.equals(CommandRegistries.NO_TARGET_ID))
                     .toList();
         };
+    }
+
+    private ActionType getSelectedActionType() {
+        ResourceLocation actionId = this.buildState.get(AwakeningComponentType.ACTION);
+        if (actionId == null) {
+            return null;
+        }
+        Action action = CommandRegistries.ACTION_REGISTRY.get().getValue(actionId);
+        return action == null ? null : action.getActionType();
+    }
+
+    private void updateCompatibilityForAction(ResourceLocation actionId) {
+        Action action = CommandRegistries.ACTION_REGISTRY.get().getValue(actionId);
+        if (action == null) {
+            return;
+        }
+        ActionType type = action.getActionType();
+
+        ResourceLocation triggerId = this.buildState.get(AwakeningComponentType.TRIGGER);
+        if (triggerId != null) {
+            Trigger trigger = CommandRegistries.TRIGGER_REGISTRY.get().getValue(triggerId);
+            if (trigger == null || !trigger.getSupportedActionTypes().contains(type)) {
+                this.buildState.set(AwakeningComponentType.TRIGGER, null);
+            }
+        }
+
+        if (type != ActionType.ENTITY) {
+            this.buildState.set(AwakeningComponentType.TARGET, null);
+        }
     }
 
     private Component getComponentName(ResourceLocation id) {

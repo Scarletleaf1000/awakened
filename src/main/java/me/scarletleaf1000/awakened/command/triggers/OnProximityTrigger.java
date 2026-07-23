@@ -1,7 +1,11 @@
 package me.scarletleaf1000.awakened.command.triggers;
 
+import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandContext;
 import me.scarletleaf1000.awakened.command.Trigger;
+
+import java.util.EnumSet;
+import java.util.Set;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -12,6 +16,11 @@ import java.util.List;
 
 public class OnProximityTrigger implements Trigger {
     private static final double RADIUS = 8.0;
+
+    @Override
+    public Set<ActionType> getSupportedActionTypes() {
+        return EnumSet.of(ActionType.ENTITY);
+    }
 
     @Override
     public Component getDisplayName() {
