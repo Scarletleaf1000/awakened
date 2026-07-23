@@ -11,7 +11,6 @@ public class CommandContext {
     private final Entity host;
     private final Level level;
     private Entity target;
-    private Entity interactedBy;
 
     public CommandContext(Entity host, Level level) {
         this.host = host;
@@ -34,11 +33,4 @@ public class CommandContext {
         this.target = target;
     }
 
-    public Entity getInteractedBy() {
-        return interactedBy;
-    }
-
-    public void setInteractedBy(Entity interactedBy) {
-        this.interactedBy = interactedBy;
-    }
 }

@@ -2,19 +2,19 @@ package me.scarletleaf1000.awakened.network;
 
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.command.Command;
-import me.scarletleaf1000.awakened.command.CommandBuilder;
 import me.scarletleaf1000.awakened.command.CommandBuildException;
+import me.scarletleaf1000.awakened.command.CommandBuilder;
 import me.scarletleaf1000.awakened.command.CommandContext;
-import me.scarletleaf1000.awakened.entity.AwakenedEntityRegistries;
-import me.scarletleaf1000.awakened.entity.AwakenedItemEntity;
+import me.scarletleaf1000.awakened.command.actions.ItemStatAction;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
+import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
@@ -53,39 +53,28 @@ public class AwakeningCommandUseC2SPacket {
                 int tier = Heightening.fromBreath(breath.getBreath()).ordinal();
                 try {
                     Command command = CommandBuilder.build(triggerId, actionId, targetId, tier);
-
                     int storedBreath = command.trigger().cost() + command.action().cost() + command.target().cost();
 
                     if (command.action().appliesToItem()) {
                         ItemStack held = player.getMainHandItem();
-                        if (!held.isEmpty()) {
-                            AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
+                        if (!(command.action() instanceof ItemStatAction itemAction) || held.isEmpty() || held.getCount() != 1 || AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.invalid_item"));
                         }
-                    } else if (command.action().transformsToEntity()) {
-                        ItemStack source = findItemToTransform(player);
-                        if (source == null || source.isEmpty()) {
-                            player.sendSystemMessage(Component.literal("You need an item in your inventory to summon an awakened entity."));
-                            return;
+                        if (!itemAction.canApplyTo(held)) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.invalid_item_for_action", itemAction.getDisplayName()));
                         }
-
-                        ItemStack visual = source.copy();
-                        visual.setCount(1);
-
-                        AwakenedItemEntity entity = new AwakenedItemEntity(AwakenedEntityRegistries.AWAKENED_ITEM.get(), player.level());
-                        entity.moveTo(player.getX(), player.getY(), player.getZ(), player.getYRot(), player.getXRot());
-                        entity.setItem(visual);
-                        entity.setCommandData(triggerId, actionId, targetId, storedBreath, player.getUUID());
-                        player.level().addFreshEntity(entity);
-
-                        source.shrink(1);
+                        if (breath.getBreath() < storedBreath) {
+                            throw new CommandBuildException(Component.translatable("message.awakened.command.insufficient_breath", storedBreath));
+                        }
+                        breath.removeBreath(storedBreath);
+                        AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
                     } else {
                         CommandContext commandCtx = new CommandContext(player, player.level());
                         command.evaluateAndExecute(commandCtx);
                     }
 
-                    Component announcement = Component.literal(
-                            "<" + player.getName().getString() + "> [Awakening] " + getCommandName(command)
-                    );
+                    Component commandName = getCommandName(command);
+                    Component announcement = Component.translatable("chat.awakened.announcement", player.getName(), commandName);
 
                     if (Heightening.fromBreath(breath.getBreath()) == Heightening.TENTH) {
                         player.sendSystemMessage(announcement.copy().withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
@@ -93,38 +82,27 @@ public class AwakeningCommandUseC2SPacket {
                         player.server.getPlayerList().broadcastSystemMessage(announcement, false);
                     }
                 } catch (CommandBuildException e) {
-                    player.sendSystemMessage(Component.literal(e.getMessage()));
+                    player.sendSystemMessage(e.getComponent());
                 }
             });
         });
         ctx.get().setPacketHandled(true);
     }
 
-    private static String getCommandName(Command command) {
-        return command.trigger().getDisplayName().getString() + " "
-                + command.action().getDisplayName().getString() + " "
-                + command.target().getDisplayName().getString();
-    }
-
-    @javax.annotation.Nullable
-    private static ItemStack findItemToTransform(ServerPlayer player) {
-        ItemStack main = player.getMainHandItem();
-        if (!main.isEmpty()) {
-            return main;
-        }
-
-        Inventory inventory = player.getInventory();
-        ItemStack offhand = inventory.offhand.get(0);
-        if (!offhand.isEmpty()) {
-            return offhand;
-        }
-
-        for (ItemStack stack : inventory.items) {
-            if (!stack.isEmpty()) {
-                return stack;
+    private static Component getCommandName(Command command) {
+        MutableComponent commandName = Component.empty();
+        boolean first = true;
+        Component[] parts = {command.trigger().getDisplayName(), command.action().getDisplayName(), command.target().getDisplayName()};
+        for (Component part : parts) {
+            if (part == null || part.getString().isBlank()) {
+                continue;
             }
+            if (!first) {
+                commandName = commandName.append(" ");
+            }
+            first = false;
+            commandName = commandName.append(part);
         }
-
-        return null;
+        return commandName;
     }
 }

@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -180,9 +181,9 @@ public class HeighteningRenderHandler {
             return;
         }
 
-        int breath = ClientBreathData.get(target.getId());
+        int breath = target == mc.player ? ownBreath : ClientBreathData.get(target.getId());
         Heightening heightening = Heightening.fromBreath(breath);
-        String text = heightening.getDisplayName();
+        FormattedCharSequence text = heightening.getDisplayName().getVisualOrderText();
 
         pose.pushPose();
         pose.translate(0.0, target.getBbHeight() + 0.75, 0.0);
@@ -488,8 +489,20 @@ public class HeighteningRenderHandler {
 
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
+            if (isFoilRenderType(renderType)) {
+                return NoopVertexConsumer.INSTANCE;
+            }
             RenderType desaturated = cache.computeIfAbsent(renderType, DesaturatedRenderType::new);
             return delegate.getBuffer(desaturated);
+        }
+
+        private static boolean isFoilRenderType(RenderType renderType) {
+            return renderType == RenderType.glint()
+                    || renderType == RenderType.glintDirect()
+                    || renderType == RenderType.entityGlint()
+                    || renderType == RenderType.entityGlintDirect()
+                    || renderType == RenderType.armorGlint()
+                    || renderType == RenderType.armorEntityGlint();
         }
 
         public void endBatch() {

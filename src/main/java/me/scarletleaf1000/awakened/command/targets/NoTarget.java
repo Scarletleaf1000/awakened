@@ -4,23 +4,19 @@ import me.scarletleaf1000.awakened.command.CommandContext;
 import me.scarletleaf1000.awakened.command.Target;
 import net.minecraft.network.chat.Component;
 
-public class InteractingEntityTarget implements Target {
+public class NoTarget implements Target {
     @Override
     public Component getDisplayName() {
-        return Component.literal("Interacting Entity");
+        return Component.empty();
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Targets the entity that right-clicked the host.");
+        return Component.translatable("target.awakened.no_target.description");
     }
 
     @Override
     public boolean select(CommandContext ctx) {
-        if (ctx.getInteractedBy() == null) {
-            return false;
-        }
-        ctx.setTarget(ctx.getInteractedBy());
         return true;
     }
 }

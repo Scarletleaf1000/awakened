@@ -26,7 +26,7 @@ public class BreathDebugCommands {
                                             ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
                                             int amount = IntegerArgumentType.getInteger(ctx, "amount");
                                             target.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(amount));
-                                            ctx.getSource().sendSuccess(() -> Component.literal("Set " + target.getName().getString() + "'s Breath to " + amount), false);
+                                            ctx.getSource().sendSuccess(() -> Component.translatable("message.awakened.debug.breath.set.success", target.getName(), amount), false);
                                             return 1;
                                         }))))
                 .then(Commands.literal("add")
@@ -36,7 +36,7 @@ public class BreathDebugCommands {
                                             ServerPlayer target = EntityArgument.getPlayer(ctx, "player");
                                             int amount = IntegerArgumentType.getInteger(ctx, "amount");
                                             target.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(amount));
-                                            ctx.getSource().sendSuccess(() -> Component.literal("Added " + amount + " Breath to " + target.getName().getString()), false);
+                                            ctx.getSource().sendSuccess(() -> Component.translatable("message.awakened.debug.breath.add.success", amount, target.getName()), false);
                                             return 1;
                                         }))))
                 .then(Commands.literal("setentity")
@@ -52,7 +52,7 @@ public class BreathDebugCommands {
                                                 }
                                             }
                                             final int finalCount = count;
-                                            ctx.getSource().sendSuccess(() -> Component.literal("Set Breath to " + amount + " for " + finalCount + " living entities"), false);
+                                            ctx.getSource().sendSuccess(() -> Component.translatable("message.awakened.debug.breath.setentity.success", amount, finalCount), false);
                                             return 1;
                                         })))));
     }

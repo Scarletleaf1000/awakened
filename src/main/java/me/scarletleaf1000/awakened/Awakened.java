@@ -3,9 +3,13 @@ package me.scarletleaf1000.awakened;
 import com.mojang.logging.LogUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -25,15 +29,12 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import me.scarletleaf1000.awakened.client.AwakenedKeyMappings;
-import me.scarletleaf1000.awakened.client.render.AwakenedItemRenderer;
 import me.scarletleaf1000.awakened.client.screens.VillagerBreathTradeScreen;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
-import me.scarletleaf1000.awakened.entity.AwakenedEntityRegistries;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import me.scarletleaf1000.awakened.trade.VillagerBreathTradeMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -57,6 +58,22 @@ public class Awakened {
     // Create a Deferred Register to hold MenuTypes
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
 
+    public static final TagKey<Item> AWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "awakenable"));
+
+    public static final RegistryObject<Item> WOOD_DOLL = ITEMS.register("wood_doll", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> STRAW_DOLL = ITEMS.register("straw_doll", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> ROPE_COIL = ITEMS.register("rope_coil", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<CreativeModeTab> AWAKENED_TAB = CREATIVE_MODE_TABS.register("awakened", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.awakened"))
+            .icon(() -> new ItemStack(ROPE_COIL.get()))
+            .displayItems((params, output) -> {
+                output.accept(WOOD_DOLL.get());
+                output.accept(STRAW_DOLL.get());
+                output.accept(ROPE_COIL.get());
+            })
+            .build());
+
     public static final RegistryObject<MenuType<VillagerBreathTradeMenu>> VILLAGER_BREATH_TRADE_MENU =
             MENU_TYPES.register("villager_breath_trade", () -> IForgeMenuType.create(VillagerBreathTradeMenu::new));
 
@@ -71,9 +88,6 @@ public class Awakened {
 
         // Register the command subsystem registries
         CommandRegistries.register(modEventBus);
-
-        // Register entity types
-        AwakenedEntityRegistries.register(modEventBus);
 
         // Register the commonSetup method for modloading
         modEventBus.addListener(this::commonSetup);
@@ -119,9 +133,6 @@ public class Awakened {
             event.register(AwakenedKeyMappings.OPEN_AWAKENING);
         }
 
-        @SubscribeEvent
-        public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
-            event.registerEntityRenderer(AwakenedEntityRegistries.AWAKENED_ITEM.get(), AwakenedItemRenderer::new);
-        }
+
     }
 }

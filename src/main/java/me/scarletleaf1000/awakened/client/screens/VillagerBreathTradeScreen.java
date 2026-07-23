@@ -40,12 +40,12 @@ public class VillagerBreathTradeScreen extends AbstractContainerScreen<VillagerB
         super.init();
         this.titleLabelX = (this.imageWidth - this.font.width(title)) / 2;
         this.inventoryLabelY = 1000;
-        this.tradeButton = Button.builder(Component.literal("Trade"), b -> confirm())
+        this.tradeButton = Button.builder(Component.translatable("gui.awakened.button.trade"), b -> confirm())
                 .bounds(leftPos + 14, topPos + 56, 72, 20)
                 .build();
         this.addRenderableWidget(this.tradeButton);
 
-        this.addRenderableWidget(Button.builder(Component.literal("Cancel"), b -> onClose())
+        this.addRenderableWidget(Button.builder(Component.translatable("gui.awakened.button.cancel"), b -> onClose())
                 .bounds(leftPos + 90, topPos + 56, 72, 20)
                 .build());
     }
@@ -127,27 +127,32 @@ public class VillagerBreathTradeScreen extends AbstractContainerScreen<VillagerB
     private Component buildMessage() {
         int breath = menu.getBreathCount();
         int cost = menu.getCost();
-        MutableComponent breathText = Component.literal(breath + " breath" + (breath == 1 ? "" : "s"))
+        Component breathText = Component.translatable(
+                breath == 1 ? "gui.awakened.trader.breath.singular" : "gui.awakened.trader.breath.plural", breath)
                 .withStyle(ChatFormatting.BLUE);
-        MutableComponent emeraldText = Component.literal(formatCost(cost) + " emeralds")
-                .withStyle(ChatFormatting.GREEN);
-        return Component.literal("I have ")
-                .append(breathText)
-                .append(", I am willing to trade them for ")
-                .append(emeraldText)
-                .append(".");
+        Component emeraldText = formatCost(cost);
+        return Component.translatable("gui.awakened.trader.message", breathText, emeraldText);
     }
 
-    private String formatCost(int emeralds) {
+    private Component formatCost(int emeralds) {
+        if (emeralds > 1000) {
+            int blocks = emeralds / 9;
+            return Component.translatable(
+                    blocks == 1 ? "gui.awakened.trader.cost.block.singular" : "gui.awakened.trader.cost.block.plural", blocks)
+                    .withStyle(ChatFormatting.GREEN);
+        }
         if (emeralds < 64) {
-            return String.valueOf(emeralds);
+            return Component.translatable("gui.awakened.trader.cost", emeralds)
+                    .withStyle(ChatFormatting.GREEN);
         }
         int stacks = emeralds / 64;
         int remainder = emeralds % 64;
         if (remainder == 0) {
-            return stacks + " stacks";
+            return Component.translatable("gui.awakened.trader.cost.stacks", stacks)
+                    .withStyle(ChatFormatting.GREEN);
         }
-        return stacks + " stacks + " + remainder;
+        return Component.translatable("gui.awakened.trader.cost.stacks_plus", stacks, remainder)
+                .withStyle(ChatFormatting.GREEN);
     }
 
     private boolean hasEnoughEmeralds() {
@@ -158,17 +163,23 @@ public class VillagerBreathTradeScreen extends AbstractContainerScreen<VillagerB
         if (player.isCreative()) {
             return true;
         }
-        int count = 0;
+        int cost = menu.getCost();
+        int emeralds = 0;
+        int blocks = 0;
         for (ItemStack stack : player.getInventory().items) {
             if (stack.is(Items.EMERALD)) {
-                count += stack.getCount();
+                emeralds += stack.getCount();
+            } else if (cost > 1000 && stack.is(Items.EMERALD_BLOCK)) {
+                blocks += stack.getCount();
             }
         }
         ItemStack offhand = player.getOffhandItem();
         if (offhand.is(Items.EMERALD)) {
-            count += offhand.getCount();
+            emeralds += offhand.getCount();
+        } else if (cost > 1000 && offhand.is(Items.EMERALD_BLOCK)) {
+            blocks += offhand.getCount();
         }
-        return count >= menu.getCost();
+        return emeralds + blocks * 9 >= cost;
     }
 
     @Override

@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    " xx",
+    "x x",
+    "xx "
+  ],
+  "key": {
+    "x": {
+      "item": "minecraft:string"
+    }
+  },
+  "result": {
+    "item": "awakened:rope_coil",
+    "count": 1
+  }
+}
