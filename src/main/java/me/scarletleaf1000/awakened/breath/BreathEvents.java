@@ -147,9 +147,6 @@ public class BreathEvents {
 
     @SubscribeEvent
     public static void onRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
-        if (event.getLevel().isClientSide()) {
-            return;
-        }
         Player player = event.getEntity();
         if (!player.isShiftKeyDown()) {
             return;
@@ -159,15 +156,19 @@ public class BreathEvents {
             if (!player.getUUID().equals(AwakenedItemData.getOwner(stack))) {
                 return;
             }
-            int breath = AwakenedItemData.remove(stack);
-            player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+            if (!event.getLevel().isClientSide()) {
+                int breath = AwakenedItemData.remove(stack);
+                player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+            }
         } else {
             if (!ItemBreathStorage.hasStoredBreath(stack) || !ItemBreathStorage.isOwnerOrPublic(stack, player)) {
                 return;
             }
-            int breath = ItemBreathStorage.getStoredBreath(stack);
-            player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
-            ItemBreathStorage.removeStoredBreath(stack);
+            if (!event.getLevel().isClientSide()) {
+                int breath = ItemBreathStorage.getStoredBreath(stack);
+                player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+                ItemBreathStorage.removeStoredBreath(stack);
+            }
         }
 
         event.setCanceled(true);
