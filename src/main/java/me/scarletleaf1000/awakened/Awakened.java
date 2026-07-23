@@ -5,9 +5,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -61,6 +63,16 @@ public class Awakened {
     public static final RegistryObject<Item> WOOD_DOLL = ITEMS.register("wood_doll", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> STRAW_DOLL = ITEMS.register("straw_doll", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ROPE_COIL = ITEMS.register("rope_coil", () -> new Item(new Item.Properties().stacksTo(1)));
+
+    public static final RegistryObject<CreativeModeTab> AWAKENED_TAB = CREATIVE_MODE_TABS.register("awakened", () -> CreativeModeTab.builder()
+            .title(Component.translatable("itemGroup.awakened"))
+            .icon(() -> new ItemStack(ROPE_COIL.get()))
+            .displayItems((params, output) -> {
+                output.accept(WOOD_DOLL.get());
+                output.accept(STRAW_DOLL.get());
+                output.accept(ROPE_COIL.get());
+            })
+            .build());
 
     public static final RegistryObject<MenuType<VillagerBreathTradeMenu>> VILLAGER_BREATH_TRADE_MENU =
             MENU_TYPES.register("villager_breath_trade", () -> IForgeMenuType.create(VillagerBreathTradeMenu::new));
