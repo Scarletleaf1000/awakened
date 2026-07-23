@@ -3,8 +3,10 @@ package me.scarletleaf1000.awakened.command;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.command.actions.AttackTargetAction;
 import me.scarletleaf1000.awakened.command.actions.FollowOwnerAction;
+import me.scarletleaf1000.awakened.command.targets.NearestEntityTarget;
 import me.scarletleaf1000.awakened.command.targets.NearestHostileTarget;
 import me.scarletleaf1000.awakened.command.triggers.OnProximityTrigger;
+import me.scarletleaf1000.awakened.command.triggers.PassiveTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -25,9 +27,11 @@ public class CommandRegistries {
     public static final Supplier<IForgeRegistry<Condition>> CONDITION_REGISTRY = CONDITIONS.makeRegistry(RegistryBuilder::new);
     public static final Supplier<IForgeRegistry<Target>> TARGET_REGISTRY = TARGETS.makeRegistry(RegistryBuilder::new);
 
+    public static final RegistryObject<Trigger> PASSIVE = TRIGGERS.register("passive", PassiveTrigger::new);
     public static final RegistryObject<Trigger> ON_PROXIMITY = TRIGGERS.register("on_proximity", OnProximityTrigger::new);
     public static final RegistryObject<Action> FOLLOW_OWNER = ACTIONS.register("follow_owner", FollowOwnerAction::new);
     public static final RegistryObject<Action> ATTACK_TARGET = ACTIONS.register("attack_target", AttackTargetAction::new);
+    public static final RegistryObject<Target> NEAREST_ENTITY = TARGETS.register("nearest_entity", NearestEntityTarget::new);
     public static final RegistryObject<Target> NEAREST_HOSTILE = TARGETS.register("nearest_hostile", NearestHostileTarget::new);
 
     public static void register(IEventBus bus) {

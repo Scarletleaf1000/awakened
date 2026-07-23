@@ -17,12 +17,7 @@ public class AwakeningBuildState {
     }
 
     public boolean isComplete() {
-        for (AwakeningComponentType type : AwakeningComponentType.values()) {
-            if (!selections.containsKey(type)) {
-                return false;
-            }
-        }
-        return true;
+        return selections.containsKey(AwakeningComponentType.ACTION);
     }
 
     public Component getSummary() {

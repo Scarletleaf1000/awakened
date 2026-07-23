@@ -64,7 +64,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getComponentButtonLabel(AwakeningComponentType type) {
-        ResourceLocation id = this.buildState.get(type);
+        ResourceLocation id = getEffectiveId(type);
         String value = id == null ? "None" : getComponentName(type, id).getString();
         return Component.literal(type.displayName() + ": " + value);
     }
@@ -75,7 +75,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             if (builder.length() > 0) {
                 builder.append(" ");
             }
-            builder.append(getComponentName(type, this.buildState.get(type)).getString());
+            builder.append(getComponentName(type, getEffectiveId(type)).getString());
         }
         builder.append("\nCost: ").append(getTotalCost());
         builder.append(" | Requires Heightening: ").append(getRequiredHeightening());
@@ -99,7 +99,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getComponentButtonDescription(AwakeningComponentType type) {
-        ResourceLocation id = this.buildState.get(type);
+        ResourceLocation id = getEffectiveId(type);
         StringBuilder builder = new StringBuilder(type.description());
         if (id != null) {
             TieredEntry entry = getComponentEntry(type, id);
@@ -114,7 +114,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private int getTotalCost() {
         int cost = 0;
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
-            ResourceLocation id = this.buildState.get(type);
+            ResourceLocation id = getEffectiveId(type);
             if (id != null) {
                 TieredEntry entry = getComponentEntry(type, id);
                 if (entry != null) {
@@ -128,7 +128,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private int getRequiredHeightening() {
         int required = 0;
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
-            ResourceLocation id = this.buildState.get(type);
+            ResourceLocation id = getEffectiveId(type);
             if (id != null) {
                 TieredEntry entry = getComponentEntry(type, id);
                 if (entry != null) {
@@ -165,11 +165,26 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         if (!this.buildState.isComplete()) {
             return;
         }
-        ResourceLocation triggerId = this.buildState.get(AwakeningComponentType.TRIGGER);
-        ResourceLocation actionId = this.buildState.get(AwakeningComponentType.ACTION);
-        ResourceLocation targetId = this.buildState.get(AwakeningComponentType.TARGET);
+        ResourceLocation actionId = getEffectiveId(AwakeningComponentType.ACTION);
+        if (actionId == null) {
+            return;
+        }
+        ResourceLocation triggerId = getEffectiveId(AwakeningComponentType.TRIGGER);
+        ResourceLocation targetId = getEffectiveId(AwakeningComponentType.TARGET);
         BreathNetwork.CHANNEL.sendToServer(new AwakeningCommandUseC2SPacket(triggerId, actionId, targetId));
         Minecraft.getInstance().setScreen(null);
+    }
+
+    private ResourceLocation getEffectiveId(AwakeningComponentType type) {
+        ResourceLocation id = this.buildState.get(type);
+        if (id != null) {
+            return id;
+        }
+        return switch (type) {
+            case TRIGGER -> new ResourceLocation(Awakened.MOD_ID, "passive");
+            case TARGET -> new ResourceLocation(Awakened.MOD_ID, "nearest_entity");
+            case ACTION -> null;
+        };
     }
 
     @Override
