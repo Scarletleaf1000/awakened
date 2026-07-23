@@ -133,5 +133,6 @@ public class Awakened {
             event.register(AwakenedKeyMappings.OPEN_AWAKENING);
         }
 
+
     }
 }

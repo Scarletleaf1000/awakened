@@ -3,8 +3,11 @@ package me.scarletleaf1000.awakened.breath;
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
+import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MobType;
@@ -139,5 +142,30 @@ public class BreathEvents {
         if (event.side == LogicalSide.SERVER && event.phase == TickEvent.Phase.END) {
             HeighteningEffects.tickPlayer(event.player);
         }
+    }
+
+    @SubscribeEvent
+    public static void onRightClickItem(net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem event) {
+        if (event.getLevel().isClientSide()) {
+            return;
+        }
+        Player player = event.getEntity();
+        if (!player.isShiftKeyDown()) {
+            return;
+        }
+        ItemStack stack = event.getItemStack();
+        if (!ItemBreathStorage.hasStoredBreath(stack)) {
+            return;
+        }
+        if (!ItemBreathStorage.isOwnerOrPublic(stack, player)) {
+            return;
+        }
+
+        int breath = ItemBreathStorage.getStoredBreath(stack);
+        player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
+        ItemBreathStorage.removeStoredBreath(stack);
+
+        event.setCanceled(true);
+        event.setCancellationResult(InteractionResult.sidedSuccess(event.getLevel().isClientSide()));
     }
 }

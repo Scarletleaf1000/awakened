@@ -78,6 +78,8 @@
   "target.awakened.no_target.description": "No target is used for this command.",
   "target.awakened.self": "Self",
   "target.awakened.self.description": "Targets the player that used the command.",
+  "tooltip.awakened.contains_breath": "Contains Breath",
+  "tooltip.awakened.stored_breaths": "Stored Breaths: %s",
   "trigger.awakened.on_proximity": "On Proximity",
   "trigger.awakened.on_proximity.description": "Activates when a hostile entity is within 8 blocks.",
   "trigger.awakened.passive": "Passive",

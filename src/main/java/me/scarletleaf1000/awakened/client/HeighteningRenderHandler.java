@@ -489,8 +489,20 @@ public class HeighteningRenderHandler {
 
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
+            if (isFoilRenderType(renderType)) {
+                return delegate.getBuffer(renderType);
+            }
             RenderType desaturated = cache.computeIfAbsent(renderType, DesaturatedRenderType::new);
             return delegate.getBuffer(desaturated);
+        }
+
+        private static boolean isFoilRenderType(RenderType renderType) {
+            return renderType == RenderType.glint()
+                    || renderType == RenderType.glintDirect()
+                    || renderType == RenderType.entityGlint()
+                    || renderType == RenderType.entityGlintDirect()
+                    || renderType == RenderType.armorGlint()
+                    || renderType == RenderType.armorEntityGlint();
         }
 
         public void endBatch() {
