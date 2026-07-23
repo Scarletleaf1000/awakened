@@ -1,13 +1,8 @@
 package me.scarletleaf1000.awakened.command;
 
 import me.scarletleaf1000.awakened.Awakened;
-import me.scarletleaf1000.awakened.command.actions.AttackTargetAction;
-import me.scarletleaf1000.awakened.command.actions.FollowOwnerAction;
-import me.scarletleaf1000.awakened.command.targets.NearestEntityTarget;
-import me.scarletleaf1000.awakened.command.targets.NearestHostileTarget;
+import me.scarletleaf1000.awakened.command.actions.PlaceholderItemAction;
 import me.scarletleaf1000.awakened.command.targets.NoTarget;
-import me.scarletleaf1000.awakened.command.targets.SelfTarget;
-import me.scarletleaf1000.awakened.command.triggers.OnProximityTrigger;
 import me.scarletleaf1000.awakened.command.triggers.PassiveTrigger;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -30,13 +25,18 @@ public class CommandRegistries {
     public static final Supplier<IForgeRegistry<Target>> TARGET_REGISTRY = TARGETS.makeRegistry(RegistryBuilder::new);
 
     public static final RegistryObject<Trigger> PASSIVE = TRIGGERS.register("passive", PassiveTrigger::new);
-    public static final RegistryObject<Trigger> ON_PROXIMITY = TRIGGERS.register("on_proximity", OnProximityTrigger::new);
-    public static final RegistryObject<Action> FOLLOW_OWNER = ACTIONS.register("follow_owner", FollowOwnerAction::new);
-    public static final RegistryObject<Action> ATTACK_TARGET = ACTIONS.register("attack_target", AttackTargetAction::new);
+    public static final RegistryObject<Action> HARDEN = ACTIONS.register("harden", () -> new PlaceholderItemAction("action.awakened.harden", 10, 2));
+    public static final RegistryObject<Action> RESIST = ACTIONS.register("resist", () -> new PlaceholderItemAction("action.awakened.resist", 100, 5));
+    public static final RegistryObject<Action> PERSIST = ACTIONS.register("persist", () -> new PlaceholderItemAction("action.awakened.persist", 300, 8));
+    public static final RegistryObject<Action> BECOME_ETERNAL = ACTIONS.register("become_eternal", () -> new PlaceholderItemAction("action.awakened.become_eternal", 1000, 9));
+    public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new PlaceholderItemAction("action.awakened.harm", 20, 2));
+    public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new PlaceholderItemAction("action.awakened.wound", 200, 4));
+    public static final RegistryObject<Action> DESTROY = ACTIONS.register("destroy", () -> new PlaceholderItemAction("action.awakened.destroy", 500, 8));
+    public static final RegistryObject<Action> REACH = ACTIONS.register("reach", () -> new PlaceholderItemAction("action.awakened.reach", 200, 4));
+    public static final RegistryObject<Action> DEFEND = ACTIONS.register("defend", () -> new PlaceholderItemAction("action.awakened.defend", 50, 3));
+    public static final RegistryObject<Action> WARD = ACTIONS.register("ward", () -> new PlaceholderItemAction("action.awakened.ward", 200, 5));
+    public static final RegistryObject<Action> PROTECT = ACTIONS.register("protect", () -> new PlaceholderItemAction("action.awakened.protect", 500, 8));
     public static final ResourceLocation NO_TARGET_ID = new ResourceLocation(Awakened.MOD_ID, "no_target");
-    public static final RegistryObject<Target> SELF = TARGETS.register("self", SelfTarget::new);
-    public static final RegistryObject<Target> NEAREST_ENTITY = TARGETS.register("nearest_entity", NearestEntityTarget::new);
-    public static final RegistryObject<Target> NEAREST_HOSTILE = TARGETS.register("nearest_hostile", NearestHostileTarget::new);
     public static final RegistryObject<Target> NO_TARGET = TARGETS.register(NO_TARGET_ID.getPath(), NoTarget::new);
 
     public static void register(IEventBus bus) {
