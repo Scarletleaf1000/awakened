@@ -18,14 +18,14 @@ import net.minecraft.world.item.ItemStack;
 
 public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Awakened.MOD_ID, "textures/gui/container/awakening_small.png");
-    private static final Component DEFAULT_DESCRIPTION = Component.literal("Build an Awakening command by selecting a Trigger, Action, and Target.");
+    private static final Component DEFAULT_DESCRIPTION = Component.translatable("gui.awakened.command_builder.description");
 
     private final AwakeningBuildState buildState;
     private SummaryBox summaryBox;
     private Button useCommandButton;
 
     public AwakeningCommandBuilderScreen(AwakeningBuildState buildState) {
-        super(Component.literal("Awaken"), BACKGROUND, 200, 250, DEFAULT_DESCRIPTION);
+        super(Component.translatable("gui.awakened.command_builder.title"), BACKGROUND, 200, 250, DEFAULT_DESCRIPTION);
         this.buildState = buildState;
     }
 
@@ -49,19 +49,19 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         }
 
         int specialY = startY + AwakeningComponentType.values().length * spacing + 4;
-        Button specialButton = Button.builder(Component.literal("Special Commands"), b -> {})
+        Button specialButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.special_commands"), b -> {})
                 .bounds(buttonX, specialY, buttonWidth, 20)
                 .build();
         specialButton.active = false;
-        this.addWidgetWithDescription(specialButton, Component.literal("Special commands are not available yet."));
+        this.addWidgetWithDescription(specialButton, Component.translatable("gui.awakened.command_builder.button.special_commands.description"));
 
         int summaryY = specialY + 20 + 20;
         int summaryWidth = this.imageWidth - 30;
         this.summaryBox = new SummaryBox(this.font, this.leftPos + 15, summaryY, summaryWidth, 44, getSummaryComponent());
-        this.addWidgetWithDescription(this.summaryBox, Component.literal("Current component selections."));
+        this.addWidgetWithDescription(this.summaryBox, Component.translatable("gui.awakened.command_builder.summary.description"));
 
         int useButtonY = summaryY + 60;
-        this.useCommandButton = Button.builder(Component.literal("Use Command"), b -> useCommand())
+        this.useCommandButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.use_command"), b -> useCommand())
                 .bounds(this.leftPos + (this.imageWidth - 100) / 2, useButtonY, 100, 20)
                 .build();
         this.useCommandButton.active = this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid();
@@ -69,12 +69,14 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getComponentButtonLabel(AwakeningComponentType type) {
+        Component value;
         if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
-            return Component.literal(type.displayName() + ": N/A");
+            value = Component.translatable("gui.awakened.command_builder.not_available");
+        } else {
+            ResourceLocation id = getEffectiveId(type);
+            value = id == null ? Component.translatable("gui.awakened.command_builder.none") : getComponentName(type, id);
         }
-        ResourceLocation id = getEffectiveId(type);
-        String value = id == null ? "None" : getComponentName(type, id).getString();
-        return Component.literal(type.displayName() + ": " + value);
+        return Component.translatable("gui.awakened.command_builder.component_label", type.getDisplayName(), value);
     }
 
     private Component getSummaryComponent() {
@@ -88,14 +90,12 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             }
             builder.append(getComponentName(type, getEffectiveId(type)).getString());
         }
-        builder.append("\nCost: ").append(getTotalCost());
-        builder.append(" | Requires Heightening: ").append(getRequiredHeightening());
-        return Component.literal(builder.toString());
+        return Component.translatable("gui.awakened.command_builder.summary", builder.toString(), getTotalCost(), getRequiredHeightening());
     }
 
     private Component getComponentName(AwakeningComponentType type, ResourceLocation id) {
         if (id == null) {
-            return Component.literal("None");
+            return Component.translatable("gui.awakened.command_builder.none");
         }
         TieredEntry entry = switch (type) {
             case TRIGGER -> CommandRegistries.TRIGGER_REGISTRY.get().getValue(id);
@@ -103,26 +103,28 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             case TARGET -> CommandRegistries.TARGET_REGISTRY.get().getValue(id);
         };
         if (entry == null) {
-            return Component.literal(id.getPath());
+            return Component.translatable("gui.awakened.command_builder.unknown", id.getPath());
         }
         Component name = entry.getDisplayName();
-        return name.getString().isEmpty() ? Component.literal(id.getPath()) : name;
+        return name.getString().isEmpty() ? Component.translatable("gui.awakened.command_builder.unknown", id.getPath()) : name;
     }
 
     private Component getComponentButtonDescription(AwakeningComponentType type) {
         if (type == AwakeningComponentType.TARGET && !isTargetUsed()) {
-            return Component.literal("No target is required for this action.");
+            return Component.translatable("gui.awakened.command_builder.target_not_required");
         }
         ResourceLocation id = getEffectiveId(type);
-        StringBuilder builder = new StringBuilder(type.description());
-        if (id != null) {
-            TieredEntry entry = getComponentEntry(type, id);
-            if (entry != null) {
-                builder.append("\nCost: ").append(entry.cost())
-                        .append("\nRequires Heightening: ").append(entry.minHeightening());
-            }
+        if (id == null) {
+            return type.getDescription();
         }
-        return Component.literal(builder.toString());
+        TieredEntry entry = getComponentEntry(type, id);
+        if (entry == null) {
+            return type.getDescription();
+        }
+        boolean locked = entry.minHeightening() > getAvailableHeightening();
+        return Component.translatable("gui.awakened.command_builder.component_description",
+                entry.getDescription(), entry.cost(), entry.minHeightening(),
+                locked ? Component.translatable("gui.awakened.command_builder.locked") : Component.empty());
     }
 
     private int getTotalCost() {
@@ -175,9 +177,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             return itemError;
         }
         if (getAvailableHeightening() < getRequiredHeightening()) {
-            return Component.literal("Requires Heightening: " + getRequiredHeightening());
+            return Component.translatable("gui.awakened.command_builder.use.heightening_required", getRequiredHeightening());
         }
-        return Component.literal("Activate the assembled command.\nCost: " + getTotalCost() + " | Requires Heightening: " + getRequiredHeightening());
+        return Component.translatable("gui.awakened.command_builder.use.activate", getTotalCost(), getRequiredHeightening());
     }
 
     private boolean isHeldItemValid() {
@@ -187,16 +189,16 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private Component getHeldItemError() {
         Minecraft mc = Minecraft.getInstance();
         if (mc.player == null) {
-            return Component.literal("Requires a non-stackable item in your main hand.");
+            return Component.translatable("gui.awakened.command_builder.use.requires_item");
         }
         ItemStack held = mc.player.getMainHandItem();
         if (held.isEmpty() || held.getMaxStackSize() != 1) {
-            return Component.literal("Requires a non-stackable item in your main hand.");
+            return Component.translatable("gui.awakened.command_builder.use.requires_item");
         }
         if (held.is(Awakened.AWAKENABLE_TAG) || getAvailableHeightening() >= Heightening.NINTH.ordinal()) {
             return null;
         }
-        return Component.literal("You are not strong enough to awaken items that were not once alive");
+        return Component.translatable("gui.awakened.command_builder.use.not_strong_enough");
     }
 
     private TieredEntry getComponentEntry(AwakeningComponentType type, ResourceLocation id) {

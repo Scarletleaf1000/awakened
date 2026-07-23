@@ -12,7 +12,7 @@ public class NoTarget implements Target {
 
     @Override
     public Component getDescription() {
-        return Component.literal("No target is used for this command.");
+        return Component.translatable("target.awakened.no_target.description");
     }
 
     @Override

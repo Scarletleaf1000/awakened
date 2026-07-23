@@ -15,12 +15,12 @@ public class NearestHostileTarget implements Target {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Nearest Hostile");
+        return Component.translatable("target.awakened.nearest_hostile");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Targets the nearest hostile living entity within 8 blocks.");
+        return Component.translatable("target.awakened.nearest_hostile.description");
     }
 
     @Override

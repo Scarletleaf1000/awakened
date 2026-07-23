@@ -27,8 +27,8 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
     private final AwakeningComponentType componentType;
 
     public AwakeningComponentSelectionScreen(Screen parent, AwakeningBuildState buildState, AwakeningComponentType componentType) {
-        super(Component.literal("Select " + componentType.displayName()), BACKGROUND, 176, 166,
-                Component.literal("Choose a " + componentType.displayName() + " component."));
+        super(Component.translatable("gui.awakened.selection.title", componentType.getDisplayName()), BACKGROUND, 176, 166,
+                Component.translatable("gui.awakened.selection.description", componentType.getDisplayName()));
         this.parent = parent;
         this.buildState = buildState;
         this.componentType = componentType;
@@ -58,10 +58,10 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
             this.addWidgetWithDescription(button, description);
         }
 
-        Button backButton = Button.builder(Component.literal("Back"), b -> Minecraft.getInstance().setScreen(this.parent))
+        Button backButton = Button.builder(Component.translatable("gui.awakened.button.back"), b -> Minecraft.getInstance().setScreen(this.parent))
                 .bounds(this.leftPos + 48, this.topPos + this.imageHeight - 30, 80, 20)
                 .build();
-        this.addWidgetWithDescription(backButton, Component.literal("Return to the command builder."));
+        this.addWidgetWithDescription(backButton, Component.translatable("gui.awakened.selection.back.description"));
     }
 
     private void select(ResourceLocation id) {
@@ -126,10 +126,10 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
     private Component getComponentName(ResourceLocation id) {
         TieredEntry entry = getEntry(id);
         if (entry == null) {
-            return Component.literal(id.getPath());
+            return Component.translatable("gui.awakened.command_builder.unknown", id.getPath());
         }
         Component name = entry.getDisplayName();
-        return name.getString().isEmpty() ? Component.literal(id.getPath()) : name;
+        return name.getString().isEmpty() ? Component.translatable("gui.awakened.command_builder.unknown", id.getPath()) : name;
     }
 
     private Component getComponentDescription(ResourceLocation id, int availableHeightening) {
@@ -138,12 +138,11 @@ public class AwakeningComponentSelectionScreen extends AbstractAwakeningScreen {
             return Component.empty();
         }
         Component description = entry.getDescription();
-        String base = description.getString().isEmpty() ? this.componentType.description() : description.getString();
+        Component base = description.getString().isEmpty() ? this.componentType.getDescription() : description;
         boolean locked = entry.minHeightening() > availableHeightening;
-        return Component.literal(base
-                + "\nCost: " + entry.cost()
-                + "\nRequires Heightening: " + entry.minHeightening()
-                + (locked ? " (Locked)" : ""));
+        return Component.translatable("gui.awakened.command_builder.component_description",
+                base, entry.cost(), entry.minHeightening(),
+                locked ? Component.translatable("gui.awakened.command_builder.locked") : Component.empty());
     }
 
     @SuppressWarnings("unchecked")

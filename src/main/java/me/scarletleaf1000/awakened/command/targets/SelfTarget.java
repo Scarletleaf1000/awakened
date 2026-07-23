@@ -7,12 +7,12 @@ import net.minecraft.network.chat.Component;
 public class SelfTarget implements Target {
     @Override
     public Component getDisplayName() {
-        return Component.literal("Self");
+        return Component.translatable("target.awakened.self");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Targets the player that used the command.");
+        return Component.translatable("target.awakened.self.description");
     }
 
     @Override

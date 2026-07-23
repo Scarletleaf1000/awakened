@@ -68,7 +68,7 @@ public class VillagerBreathTradeHandler {
         NetworkHooks.openScreen(player, new SimpleMenuProvider(
                         (id, inv, p) -> new VillagerBreathTradeMenu(Awakened.VILLAGER_BREATH_TRADE_MENU.get(),
                                 id, inv, villager.getId(), breath, cost),
-                        Component.literal("Villager Breath Trade")),
+                        Component.translatable("gui.awakened.trader.title")),
                 buf -> {
                     buf.writeInt(villager.getId());
                     buf.writeInt(breath);

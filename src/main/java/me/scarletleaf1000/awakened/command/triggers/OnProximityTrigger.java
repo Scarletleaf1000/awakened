@@ -24,12 +24,12 @@ public class OnProximityTrigger implements Trigger {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("On Proximity");
+        return Component.translatable("trigger.awakened.on_proximity");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Activates when a hostile entity is within 8 blocks.");
+        return Component.translatable("trigger.awakened.on_proximity.description");
     }
 
     @Override

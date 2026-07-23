@@ -16,12 +16,12 @@ public class PassiveTrigger implements Trigger {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Passive");
+        return Component.translatable("trigger.awakened.passive");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Always activates when the command is used.");
+        return Component.translatable("trigger.awakened.passive.description");
     }
 
     @Override

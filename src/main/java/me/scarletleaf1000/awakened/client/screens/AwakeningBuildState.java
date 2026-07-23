@@ -1,6 +1,7 @@
 package me.scarletleaf1000.awakened.client.screens;
 
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 
 import java.util.EnumMap;
@@ -21,15 +22,20 @@ public class AwakeningBuildState {
     }
 
     public Component getSummary() {
-        StringBuilder builder = new StringBuilder();
+        MutableComponent summary = Component.empty();
+        Component separator = Component.translatable("gui.awakened.command_builder.separator");
+        boolean first = true;
         for (AwakeningComponentType type : AwakeningComponentType.values()) {
             ResourceLocation id = selections.get(type);
-            String value = id == null ? "None" : id.getPath();
-            if (builder.length() > 0) {
-                builder.append(" | ");
+            Component value = id == null
+                    ? Component.translatable("gui.awakened.command_builder.none")
+                    : Component.translatable("gui.awakened.command_builder.unknown", id.getPath());
+            if (!first) {
+                summary.append(separator);
             }
-            builder.append(type.displayName()).append(": ").append(value);
+            first = false;
+            summary.append(Component.translatable("gui.awakened.command_builder.component_label", type.getDisplayName(), value));
         }
-        return Component.literal(builder.toString());
+        return summary;
     }
 }

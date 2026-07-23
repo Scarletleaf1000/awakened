@@ -13,12 +13,12 @@ public class AttackTargetAction implements Action {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Attack Target");
+        return Component.translatable("action.awakened.attack_target");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Orders the host to attack the selected target.");
+        return Component.translatable("action.awakened.attack_target.description");
     }
 
     @Override

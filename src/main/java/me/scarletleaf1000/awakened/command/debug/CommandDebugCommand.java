@@ -40,10 +40,10 @@ public class CommandDebugCommand {
             Entity executor = ctx.getSource().getEntityOrException();
             CommandContext commandCtx = new CommandContext(executor, executor.level());
             boolean fired = command.evaluateAndExecute(commandCtx);
-            ctx.getSource().sendSuccess(() -> Component.literal("Awakened command test fired: " + fired), false);
+            ctx.getSource().sendSuccess(() -> Component.translatable("message.awakened.debug.command_test.success", fired), false);
             return 1;
         } catch (Exception e) {
-            ctx.getSource().sendFailure(Component.literal("Awakened command test failed: " + e.getMessage()));
+            ctx.getSource().sendFailure(Component.translatable("message.awakened.debug.command_test.failure", e.getMessage()));
             return 0;
         }
     }

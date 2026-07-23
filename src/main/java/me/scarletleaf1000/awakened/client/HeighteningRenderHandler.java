@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
 import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -182,7 +183,7 @@ public class HeighteningRenderHandler {
 
         int breath = target == mc.player ? ownBreath : ClientBreathData.get(target.getId());
         Heightening heightening = Heightening.fromBreath(breath);
-        String text = heightening.getDisplayName();
+        FormattedCharSequence text = heightening.getDisplayName().getVisualOrderText();
 
         pose.pushPose();
         pose.translate(0.0, target.getBbHeight() + 0.75, 0.0);

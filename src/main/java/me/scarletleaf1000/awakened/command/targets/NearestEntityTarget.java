@@ -14,12 +14,12 @@ public class NearestEntityTarget implements Target {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Nearest Entity");
+        return Component.translatable("target.awakened.nearest_entity");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Targets the nearest living entity within 8 blocks.");
+        return Component.translatable("target.awakened.nearest_entity.description");
     }
 
     @Override

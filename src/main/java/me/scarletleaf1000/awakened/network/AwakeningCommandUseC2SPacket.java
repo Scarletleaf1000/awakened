@@ -10,6 +10,7 @@ import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
@@ -65,9 +66,8 @@ public class AwakeningCommandUseC2SPacket {
                         command.evaluateAndExecute(commandCtx);
                     }
 
-                    Component announcement = Component.literal(
-                            "<" + player.getName().getString() + "> [Awakening] " + getCommandName(command)
-                    );
+                    Component commandName = getCommandName(command);
+                    Component announcement = Component.translatable("chat.awakened.announcement", player.getName(), commandName);
 
                     if (Heightening.fromBreath(breath.getBreath()) == Heightening.TENTH) {
                         player.sendSystemMessage(announcement.copy().withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
@@ -75,25 +75,28 @@ public class AwakeningCommandUseC2SPacket {
                         player.server.getPlayerList().broadcastSystemMessage(announcement, false);
                     }
                 } catch (CommandBuildException e) {
-                    player.sendSystemMessage(Component.literal(e.getMessage()));
+                    player.sendSystemMessage(e.getComponent());
                 }
             });
         });
         ctx.get().setPacketHandled(true);
     }
 
-    private static String getCommandName(Command command) {
-        List<String> parts = new ArrayList<>();
-        addIfNotBlank(parts, command.trigger().getDisplayName().getString());
-        addIfNotBlank(parts, command.action().getDisplayName().getString());
-        addIfNotBlank(parts, command.target().getDisplayName().getString());
-        return String.join(" ", parts);
-    }
-
-    private static void addIfNotBlank(List<String> parts, String part) {
-        if (part != null && !part.isBlank()) {
-            parts.add(part);
+    private static Component getCommandName(Command command) {
+        MutableComponent commandName = Component.empty();
+        boolean first = true;
+        Component[] parts = { command.trigger().getDisplayName(), command.action().getDisplayName(), command.target().getDisplayName() };
+        for (Component part : parts) {
+            if (part == null || part.getString().isBlank()) {
+                continue;
+            }
+            if (!first) {
+                commandName = commandName.append(" ");
+            }
+            first = false;
+            commandName = commandName.append(part);
         }
+        return commandName;
     }
 
 }

@@ -13,12 +13,12 @@ public class FollowOwnerAction implements Action {
 
     @Override
     public Component getDisplayName() {
-        return Component.literal("Follow Target");
+        return Component.translatable("action.awakened.follow_owner");
     }
 
     @Override
     public Component getDescription() {
-        return Component.literal("Orders the host to follow the selected target.");
+        return Component.translatable("action.awakened.follow_owner.description");
     }
 
     @Override

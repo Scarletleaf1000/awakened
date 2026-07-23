@@ -4,6 +4,7 @@ import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -20,7 +21,7 @@ public class BreathHudOverlay {
 
         mc.player.getCapability(BreathProvider.BREATH).ifPresent(breath -> {
             Heightening heightening = Heightening.fromBreath(breath.getBreath());
-            String text = "Breath: " + breath.getBreath() + " (" + heightening.getDisplayName() + ")";
+            Component text = Component.translatable("gui.awakened.hud.breath", breath.getBreath(), heightening.getDisplayName());
             int x = 5;
             int y = mc.getWindow().getGuiScaledHeight() - 15;
             event.getGuiGraphics().drawString(mc.font, text, x, y, 0x0000FF, true);

@@ -4,34 +4,36 @@ package me.scarletleaf1000.awakened.heightening;
  * Heightening tiers from Warbreaker. Tiers are unlocked by reaching the
  * required Breath threshold. Values 1-9 have no tier; 0 is Drab.
  */
+import net.minecraft.network.chat.Component;
+
 public enum Heightening {
-    DRAB(0, "Drab"),
-    NO_HEIGHTENING(1, "No Heightening"),
-    FIRST(10, "First Heightening"),
-    SECOND(25, "Second Heightening"),
-    THIRD(50, "Third Heightening"),
-    FOURTH(100, "Fourth Heightening"),
-    FIFTH(150, "Fifth Heightening"),
-    SIXTH(250, "Sixth Heightening"),
-    SEVENTH(400, "Seventh Heightening"),
-    EIGHTH(600, "Eighth Heightening"),
-    NINTH(1000, "Ninth Heightening"),
-    TENTH(2000, "Tenth Heightening");
+    DRAB(0, "heightening.awakened.drab"),
+    NO_HEIGHTENING(1, "heightening.awakened.none"),
+    FIRST(10, "heightening.awakened.first"),
+    SECOND(25, "heightening.awakened.second"),
+    THIRD(50, "heightening.awakened.third"),
+    FOURTH(100, "heightening.awakened.fourth"),
+    FIFTH(150, "heightening.awakened.fifth"),
+    SIXTH(250, "heightening.awakened.sixth"),
+    SEVENTH(400, "heightening.awakened.seventh"),
+    EIGHTH(600, "heightening.awakened.eighth"),
+    NINTH(1000, "heightening.awakened.ninth"),
+    TENTH(2000, "heightening.awakened.tenth");
 
     private final int threshold;
-    private final String displayName;
+    private final String displayNameKey;
 
-    Heightening(int threshold, String displayName) {
+    Heightening(int threshold, String displayNameKey) {
         this.threshold = threshold;
-        this.displayName = displayName;
+        this.displayNameKey = displayNameKey;
     }
 
     public int getThreshold() {
         return threshold;
     }
 
-    public String getDisplayName() {
-        return displayName;
+    public Component getDisplayName() {
+        return Component.translatable(displayNameKey);
     }
 
     /**

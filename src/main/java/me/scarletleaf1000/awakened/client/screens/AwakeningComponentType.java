@@ -1,23 +1,23 @@
 package me.scarletleaf1000.awakened.client.screens;
 
+import net.minecraft.network.chat.Component;
+
 public enum AwakeningComponentType {
-    TRIGGER("Trigger", "Choose when this command activates."),
-    ACTION("Action", "Choose what this command does."),
-    TARGET("Target", "Choose who this command affects.");
+    TRIGGER("gui.awakened.component_type.trigger"),
+    ACTION("gui.awakened.component_type.action"),
+    TARGET("gui.awakened.component_type.target");
 
-    private final String displayName;
-    private final String description;
+    private final String key;
 
-    AwakeningComponentType(String displayName, String description) {
-        this.displayName = displayName;
-        this.description = description;
+    AwakeningComponentType(String key) {
+        this.key = key;
     }
 
-    public String displayName() {
-        return displayName;
+    public Component getDisplayName() {
+        return Component.translatable(key);
     }
 
-    public String description() {
-        return description;
+    public Component getDescription() {
+        return Component.translatable(key + ".description");
     }
 }

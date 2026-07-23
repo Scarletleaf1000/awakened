@@ -1,5 +1,6 @@
 package me.scarletleaf1000.awakened.command;
 
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -29,20 +30,20 @@ public final class CommandBuilder {
     private static <T extends TieredEntry> T getEntry(IForgeRegistry<T> registry, ResourceLocation id) {
         T entry = registry.getValue(id);
         if (entry == null) {
-            throw new CommandBuildException("Unknown registry entry: " + id);
+            throw new CommandBuildException(Component.translatable("message.awakened.command.unknown_entry", id));
         }
         return entry;
     }
 
     private static void validateTier(TieredEntry entry, ResourceLocation id, int availableTier) {
         if (entry.minTier() > availableTier) {
-            throw new CommandBuildException("Entry " + id + " requires tier " + entry.minTier() + ", but available tier is " + availableTier);
+            throw new CommandBuildException(Component.translatable("message.awakened.command.tier_required", id, entry.minTier(), availableTier));
         }
     }
 
     private static void validateHeightening(TieredEntry entry, ResourceLocation id, int availableTier) {
         if (entry.minHeightening() > availableTier) {
-            throw new CommandBuildException("Entry " + id + " requires heightening " + entry.minHeightening() + ", but available heightening is " + availableTier);
+            throw new CommandBuildException(Component.translatable("message.awakened.command.heightening_required", id, entry.minHeightening(), availableTier));
         }
     }
 
