@@ -28,7 +28,6 @@ import net.minecraftforge.network.NetworkHooks;
 public class VillagerBreathTradeHandler {
     private static final int MIN_COST_PER_BREATH = 32;
     private static final int MAX_COST_PER_BREATH = 64;
-    private static final int MAX_TOTAL_COST = 64 * 36; // full inventory of emeralds
     private static final String COST_TAG = "awakened:breath_trade_costs";
 
     @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
@@ -93,12 +92,12 @@ public class VillagerBreathTradeHandler {
         }
 
         int cost = computeCost(villager, player);
-        if (!player.isCreative() && countEmeralds(player) < cost) {
+        if (!player.isCreative() && countCurrency(player, cost) < cost) {
             BreathNetwork.sendVillagerTradeResult(player, false);
             return;
         }
 
-        removeEmeralds(player, cost);
+        removeCurrency(player, cost);
         player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
         villager.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(0));
         villager.getPersistentData().remove(COST_TAG);
@@ -106,18 +105,23 @@ public class VillagerBreathTradeHandler {
         BreathNetwork.sendVillagerTradeResult(player, true);
     }
 
-    public static int countEmeralds(Player player) {
-        int count = 0;
+    public static int countCurrency(Player player, int cost) {
+        int emeralds = 0;
+        int blocks = 0;
         for (ItemStack stack : player.getInventory().items) {
             if (stack.is(Items.EMERALD)) {
-                count += stack.getCount();
+                emeralds += stack.getCount();
+            } else if (cost > 1000 && stack.is(Items.EMERALD_BLOCK)) {
+                blocks += stack.getCount();
             }
         }
         ItemStack offhand = player.getOffhandItem();
         if (offhand.is(Items.EMERALD)) {
-            count += offhand.getCount();
+            emeralds += offhand.getCount();
+        } else if (cost > 1000 && offhand.is(Items.EMERALD_BLOCK)) {
+            blocks += offhand.getCount();
         }
-        return count;
+        return emeralds + blocks * 9;
     }
 
     private static int computeCost(Villager villager, Player player) {
@@ -132,7 +136,10 @@ public class VillagerBreathTradeHandler {
         for (int base : baseCosts) {
             total += Math.max(12, base - 8 * discountLevel);
         }
-        return Math.min(MAX_TOTAL_COST, total);
+        if (total > 1000) {
+            total = (int) (Math.ceil(total / 9.0) * 9);
+        }
+        return total;
     }
 
     private static int[] getOrCreateBaseCosts(Villager villager) {
@@ -156,10 +163,23 @@ public class VillagerBreathTradeHandler {
         return costs;
     }
 
-    private static void removeEmeralds(Player player, int amount) {
+    private static void removeCurrency(Player player, int amount) {
         if (player.isCreative() || amount <= 0) {
             return;
         }
+        if (amount > 1000) {
+            amount = consumeBlocks(player.getOffhandItem(), amount);
+            if (amount <= 0) {
+                return;
+            }
+            for (ItemStack stack : player.getInventory().items) {
+                amount = consumeBlocks(stack, amount);
+                if (amount <= 0) {
+                    break;
+                }
+            }
+        }
+
         amount = consumeEmeralds(player.getOffhandItem(), amount);
         if (amount <= 0) {
             return;
@@ -179,5 +199,14 @@ public class VillagerBreathTradeHandler {
         int remove = Math.min(amount, stack.getCount());
         stack.shrink(remove);
         return amount - remove;
+    }
+
+    private static int consumeBlocks(ItemStack stack, int amount) {
+        if (stack.isEmpty() || !stack.is(Items.EMERALD_BLOCK) || amount < 9) {
+            return amount;
+        }
+        int blocksToRemove = Math.min(amount / 9, stack.getCount());
+        stack.shrink(blocksToRemove);
+        return amount - blocksToRemove * 9;
     }
 }

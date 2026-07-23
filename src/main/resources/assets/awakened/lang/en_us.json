@@ -39,6 +39,8 @@
   "gui.awakened.trader.breath.plural": "%s breaths",
   "gui.awakened.trader.breath.singular": "%s breath",
   "gui.awakened.trader.cost": "%s emeralds",
+  "gui.awakened.trader.cost.block.plural": "%s blocks of emerald",
+  "gui.awakened.trader.cost.block.singular": "%s block of emerald",
   "gui.awakened.trader.cost.stacks": "%s stacks",
   "gui.awakened.trader.cost.stacks_plus": "%s stacks + %s",
   "gui.awakened.trader.message": "I have %1$s, I am willing to trade them for %2$s.",
