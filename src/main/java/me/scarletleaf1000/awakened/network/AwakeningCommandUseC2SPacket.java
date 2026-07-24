@@ -1,5 +1,6 @@
 package me.scarletleaf1000.awakened.network;
 
+import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.command.Command;
 import me.scarletleaf1000.awakened.command.CommandBuildException;
@@ -57,7 +58,7 @@ public class AwakeningCommandUseC2SPacket {
 
                     if (command.action().appliesToItem()) {
                         ItemStack held = player.getMainHandItem();
-                        if (!(command.action() instanceof ItemStatAction itemAction) || held.isEmpty() || held.getCount() != 1 || AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+                        if (!(command.action() instanceof ItemStatAction itemAction) || held.isEmpty() || held.getCount() != 1 || AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held) || held.is(Awakened.UNAWAKENABLE_TAG)) {
                             throw new CommandBuildException(Component.translatable("message.awakened.command.invalid_item"));
                         }
                         if (!itemAction.canApplyTo(held)) {

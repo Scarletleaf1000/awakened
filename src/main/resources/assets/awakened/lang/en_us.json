@@ -47,6 +47,7 @@
   "gui.awakened.command_builder.use.activate": "Activate the assembled command.\nCost: %s | Requires Heightening: %s",
   "gui.awakened.command_builder.use.heightening_required": "Requires Heightening: %s",
   "gui.awakened.command_builder.use.not_strong_enough": "You are not strong enough to awaken items that were not once alive",
+  "gui.awakened.command_builder.use.unawakenable": "This item cannot be awakened.",
   "gui.awakened.command_builder.use.requires_item": "Requires a non-stackable item in your main hand.",
   "gui.awakened.component_type.action": "Action",
   "gui.awakened.component_type.action.description": "Choose what this command does.",

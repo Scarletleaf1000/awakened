@@ -20,6 +20,12 @@
     "minecraft:bundle",
     "awakened:wood_doll",
     "awakened:straw_doll",
-    "awakened:rope_coil"
+    "awakened:rope_coil",
+    "stormward:carapace_helmet",
+    "stormward:carapace_chestplate",
+    "stormward:carapace_leggings",
+    "stormward:carapace_boots",
+    "stormward:wooden_spear",
+    "allomancy:mistcloak"
   ]
 }
