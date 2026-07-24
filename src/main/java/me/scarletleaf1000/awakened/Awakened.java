@@ -59,6 +59,7 @@ public class Awakened {
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
 
     public static final TagKey<Item> AWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "awakenable"));
+    public static final TagKey<Item> UNAWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "unawakenable"));
 
     public static final RegistryObject<Item> WOOD_DOLL = ITEMS.register("wood_doll", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> STRAW_DOLL = ITEMS.register("straw_doll", () -> new Item(new Item.Properties().stacksTo(1)));

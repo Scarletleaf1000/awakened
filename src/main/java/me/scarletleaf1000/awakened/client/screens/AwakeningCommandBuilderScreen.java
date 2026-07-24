@@ -201,6 +201,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         if (held.isEmpty() || held.getMaxStackSize() != 1) {
             return Component.translatable("gui.awakened.command_builder.use.requires_item");
         }
+        if (held.is(Awakened.UNAWAKENABLE_TAG)) {
+            return Component.translatable("gui.awakened.command_builder.use.unawakenable");
+        }
         if (held.is(Awakened.AWAKENABLE_TAG) || getAvailableHeightening() >= Heightening.NINTH.ordinal()) {
             return null;
         }
