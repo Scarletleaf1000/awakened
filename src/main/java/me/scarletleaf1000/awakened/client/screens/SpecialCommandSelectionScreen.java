@@ -29,6 +29,11 @@ public class SpecialCommandSelectionScreen extends AbstractAwakeningScreen {
                 .build();
         this.addWidgetWithDescription(commandButton, Component.translatable("gui.awakened.special.my_breath_to_yours.description"));
 
+        Button destroyEvilButton = Button.builder(SpecialCommand.DESTROY_EVIL.getDisplayName(), b -> select(SpecialCommand.DESTROY_EVIL))
+                .bounds(this.leftPos + 18, this.topPos + 62, 140, 20)
+                .build();
+        this.addWidgetWithDescription(destroyEvilButton, Component.translatable("gui.awakened.special.destroy_evil.description"));
+
         Button backButton = Button.builder(Component.translatable("gui.awakened.button.back"), b -> Minecraft.getInstance().setScreen(this.parent))
                 .bounds(this.leftPos + 48, this.topPos + this.imageHeight - 30, 80, 20)
                 .build();

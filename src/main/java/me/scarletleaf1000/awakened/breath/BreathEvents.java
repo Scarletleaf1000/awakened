@@ -182,6 +182,9 @@ public class BreathEvents {
             return;
         }
         ItemStack stack = event.getItemStack();
+        if (stack.is(Awakened.NIGHTBLOOD.get())) {
+            return;
+        }
         if (AwakenedItemData.isAwakened(stack)) {
             if (!player.getUUID().equals(AwakenedItemData.getOwner(stack))) {
                 return;

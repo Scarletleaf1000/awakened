@@ -12,6 +12,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.Tiers;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -32,9 +34,11 @@ import me.scarletleaf1000.awakened.breath.BreathAttributes;
 import me.scarletleaf1000.awakened.client.AwakenedKeyMappings;
 import me.scarletleaf1000.awakened.client.screens.VillagerBreathTradeScreen;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
+import me.scarletleaf1000.awakened.item.NightbloodSwordItem;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import me.scarletleaf1000.awakened.trade.VillagerBreathTradeMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.registries.DeferredRegister;
@@ -65,6 +69,8 @@ public class Awakened {
     public static final RegistryObject<Item> WOOD_DOLL = ITEMS.register("wood_doll", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> STRAW_DOLL = ITEMS.register("straw_doll", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> ROPE_COIL = ITEMS.register("rope_coil", () -> new Item(new Item.Properties().stacksTo(1)));
+    public static final RegistryObject<Item> NIGHTBLOOD = ITEMS.register("nightblood",
+            () -> new NightbloodSwordItem(new Item.Properties().stacksTo(1).durability(Tiers.NETHERITE.getUses())));
 
     public static final RegistryObject<CreativeModeTab> AWAKENED_TAB = CREATIVE_MODE_TABS.register("awakened", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.awakened"))
@@ -73,6 +79,7 @@ public class Awakened {
                 output.accept(WOOD_DOLL.get());
                 output.accept(STRAW_DOLL.get());
                 output.accept(ROPE_COIL.get());
+                output.accept(NIGHTBLOOD.get());
             })
             .build());
 
@@ -81,6 +88,8 @@ public class Awakened {
 
     public Awakened() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC);
 
         // Register the deferred registers to the mod event bus
         BLOCKS.register(modEventBus);
@@ -126,9 +135,17 @@ public class Awakened {
 
         @SubscribeEvent
         public static void onClientSetup(FMLClientSetupEvent event) {
-            event.enqueueWork(() ->
-                MenuScreens.register(Awakened.VILLAGER_BREATH_TRADE_MENU.get(), VillagerBreathTradeScreen::new)
-            );
+            event.enqueueWork(() -> {
+                MenuScreens.register(Awakened.VILLAGER_BREATH_TRADE_MENU.get(), VillagerBreathTradeScreen::new);
+                ItemProperties.register(Awakened.NIGHTBLOOD.get(),
+                        new ResourceLocation(Awakened.MOD_ID, "nightblood_held"),
+                        (stack, level, entity, seed) -> {
+                            if (entity instanceof Player player && player.getMainHandItem() == stack) {
+                                return 1.0f;
+                            }
+                            return 0.0f;
+                        });
+            });
         }
 
         @SubscribeEvent
