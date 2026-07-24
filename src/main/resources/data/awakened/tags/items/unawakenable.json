@@ -1,6 +1,7 @@
 {
   "replace": false,
   "values": [
+    "awakened:nightblood",
     "feruchemy:bands_of_mourning",
     "feruchemy:iron_ring_metalmind",
     "feruchemy:iron_bracelet_metalmind",
@@ -114,6 +115,7 @@
     "stormward:mistspren_shardplate_helmet",
     "stormward:mistspren_shardplate_chestplate",
     "stormward:mistspren_shardplate_leggings",
-    "stormward:mistspren_shardplate_boots"
+    "stormward:mistspren_shardplate_boots",
+    "awakened:nightblood"
   ]
 }

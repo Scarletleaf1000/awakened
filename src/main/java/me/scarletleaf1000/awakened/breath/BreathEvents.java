@@ -6,11 +6,14 @@ import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.MobType;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
@@ -38,19 +41,22 @@ public class BreathEvents {
 
     @SubscribeEvent
     public static void onPlayerClone(PlayerEvent.Clone event) {
-        event.getOriginal().getCapability(BreathProvider.BREATH).ifPresent(old -> {
-            event.getEntity().getCapability(BreathProvider.BREATH).ifPresent(newCap -> {
-                newCap.setBreath(old.getBreath());
-            });
-        });
+        copyBreath(event.getOriginal(), event.getEntity());
         if (event.getOriginal().getPersistentData().getBoolean("awakened:breath_init")) {
             event.getEntity().getPersistentData().putBoolean("awakened:breath_init", true);
         }
     }
 
+    private static void copyBreath(LivingEntity from, LivingEntity to) {
+        AttributeInstance attr = from.getAttribute(BreathAttributes.BREATH.get());
+        int breath = attr == null ? 1 : (int) attr.getBaseValue();
+        to.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(breath));
+    }
+
     @SubscribeEvent
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
+            migrateFromLegacyNBT(player);
             if (!player.getPersistentData().getBoolean("awakened:breath_init")) {
                 int breath = player.getRandom().nextInt(10); // 0-9
                 player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(breath));
@@ -70,12 +76,36 @@ public class BreathEvents {
         if (!(event.getEntity() instanceof LivingEntity living) || living instanceof Player) {
             return;
         }
+        migrateFromLegacyNBT(living);
         if (living.getPersistentData().getBoolean("awakened:breath_init")) {
             return;
         }
         int breath = determineInitialBreath(living);
         living.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(breath));
         living.getPersistentData().putBoolean("awakened:breath_init", true);
+    }
+
+    private static void migrateFromLegacyNBT(LivingEntity entity) {
+        CompoundTag nbt = entity.saveWithoutId(new CompoundTag());
+        if (!nbt.contains("ForgeCaps", Tag.TAG_COMPOUND)) {
+            return;
+        }
+        CompoundTag forgeCaps = nbt.getCompound("ForgeCaps");
+        if (!forgeCaps.contains("awakened:breath", Tag.TAG_COMPOUND)) {
+            return;
+        }
+        CompoundTag capTag = forgeCaps.getCompound("awakened:breath");
+        if (!capTag.contains("breath", Tag.TAG_INT)) {
+            return;
+        }
+        int legacyBreath = capTag.getInt("breath");
+        entity.getCapability(BreathProvider.BREATH).ifPresent(b -> {
+            if (b instanceof BreathCapability cap) {
+                cap.setBreathInternal(legacyBreath);
+            } else {
+                b.setBreath(legacyBreath);
+            }
+        });
     }
 
     private static int determineInitialBreath(LivingEntity entity) {
@@ -122,7 +152,7 @@ public class BreathEvents {
                 victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
                 killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
             } else {
-                int loss = Math.min(25, Math.max(1, victimBreath / 10));
+                int loss = Math.min(25, Math.max(1, victimBreath / 20));
                 victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(loss));
             }
         } else if (killer instanceof Player killerPlayer) {
@@ -152,6 +182,9 @@ public class BreathEvents {
             return;
         }
         ItemStack stack = event.getItemStack();
+        if (stack.is(Awakened.NIGHTBLOOD.get())) {
+            return;
+        }
         if (AwakenedItemData.isAwakened(stack)) {
             if (!player.getUUID().equals(AwakenedItemData.getOwner(stack))) {
                 return;

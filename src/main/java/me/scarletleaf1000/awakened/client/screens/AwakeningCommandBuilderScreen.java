@@ -5,16 +5,21 @@ import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.command.Action;
 import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
+import me.scarletleaf1000.awakened.command.SpecialCommand;
 import me.scarletleaf1000.awakened.command.TieredEntry;
 import me.scarletleaf1000.awakened.command.Trigger;
 import me.scarletleaf1000.awakened.heightening.Heightening;
+import me.scarletleaf1000.awakened.item.AwakenedItemData;
+import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import me.scarletleaf1000.awakened.network.AwakeningCommandUseC2SPacket;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
+import me.scarletleaf1000.awakened.network.DestroyEvilCommandUseC2SPacket;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 
 public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     private static final ResourceLocation BACKGROUND = new ResourceLocation(Awakened.MOD_ID, "textures/gui/container/awakening_small.png");
@@ -64,7 +69,7 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         this.useCommandButton = Button.builder(Component.translatable("gui.awakened.command_builder.button.use_command"), b -> useCommand())
                 .bounds(this.leftPos + (this.imageWidth - 100) / 2, useButtonY, 100, 20)
                 .build();
-        this.useCommandButton.active = (this.buildState.getSpecialCommand() != null || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
+        this.useCommandButton.active = (isSpecialCommandReady() || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
         this.addWidgetWithDescription(this.useCommandButton, getUseCommandDescription());
     }
 
@@ -175,7 +180,11 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private Component getUseCommandDescription() {
-        if (this.buildState.getSpecialCommand() != null) {
+        SpecialCommand special = this.buildState.getSpecialCommand();
+        if (special != null) {
+            if (special == SpecialCommand.DESTROY_EVIL) {
+                return getDestroyEvilDescription();
+            }
             return Component.translatable("gui.awakened.special.my_breath_to_yours.use.description");
         }
         Component itemError = getHeldItemError();
@@ -186,6 +195,24 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
             return Component.translatable("gui.awakened.command_builder.use.heightening_required", getRequiredHeightening());
         }
         return Component.translatable("gui.awakened.command_builder.use.activate", getTotalCost(), getRequiredHeightening());
+    }
+
+    private Component getDestroyEvilDescription() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null) {
+            return Component.translatable("gui.awakened.command_builder.use.requires_item");
+        }
+        ItemStack held = mc.player.getMainHandItem();
+        if (held.isEmpty() || held.getCount() != 1 || !held.is(Items.NETHERITE_SWORD)) {
+            return Component.translatable("gui.awakened.command_builder.use.requires_item");
+        }
+        if (AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+            return Component.translatable("gui.awakened.command_builder.use.invalid_item");
+        }
+        if (getAvailableHeightening() < Heightening.NINTH.ordinal()) {
+            return Component.translatable("gui.awakened.command_builder.use.heightening_required", Heightening.NINTH.ordinal());
+        }
+        return Component.translatable("gui.awakened.special.destroy_evil.use.description");
     }
 
     private boolean isHeldItemValid() {
@@ -223,7 +250,13 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     }
 
     private void useCommand() {
-        if (this.buildState.getSpecialCommand() != null) {
+        SpecialCommand special = this.buildState.getSpecialCommand();
+        if (special != null) {
+            if (special == SpecialCommand.DESTROY_EVIL) {
+                BreathNetwork.CHANNEL.sendToServer(new DestroyEvilCommandUseC2SPacket());
+                Minecraft.getInstance().setScreen(null);
+                return;
+            }
             Minecraft.getInstance().setScreen(new BreathTransferTargetScreen(this));
             return;
         }
@@ -292,9 +325,31 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
     public void tick() {
         super.tick();
         if (this.useCommandButton != null) {
-            this.useCommandButton.active = (this.buildState.getSpecialCommand() != null || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
+            this.useCommandButton.active = (isSpecialCommandReady() || this.buildState.isComplete() && getAvailableHeightening() >= getRequiredHeightening() && isHeldItemValid());
             this.descriptions.put(this.useCommandButton, getUseCommandDescription());
         }
+    }
+
+    private boolean isSpecialCommandReady() {
+        SpecialCommand special = this.buildState.getSpecialCommand();
+        if (special == null) {
+            return false;
+        }
+        if (special == SpecialCommand.DESTROY_EVIL) {
+            Minecraft mc = Minecraft.getInstance();
+            if (mc.player == null) {
+                return false;
+            }
+            ItemStack held = mc.player.getMainHandItem();
+            if (held.isEmpty() || held.getCount() != 1 || !held.is(Items.NETHERITE_SWORD)) {
+                return false;
+            }
+            if (AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+                return false;
+            }
+            return getAvailableHeightening() >= Heightening.NINTH.ordinal();
+        }
+        return true;
     }
 
     @Override

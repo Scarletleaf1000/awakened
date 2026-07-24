@@ -2,6 +2,7 @@ package me.scarletleaf1000.awakened.breath;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -34,13 +35,15 @@ public class BreathProvider implements ICapabilityProvider, INBTSerializable<Com
 
     @Override
     public CompoundTag serializeNBT() {
-        CompoundTag tag = new CompoundTag();
-        tag.putInt("breath", breath.getBreath());
-        return tag;
+        // Breath is now stored in an entity attribute; keep this empty so the old NBT data is removed on save.
+        return new CompoundTag();
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        breath.setBreathInternal(tag.getInt("breath"));
+        // Legacy migration: old worlds stored breath under the "breath" key.
+        if (tag.contains("breath", Tag.TAG_INT)) {
+            breath.setBreathInternal(tag.getInt("breath"));
+        }
     }
 }

@@ -17,5 +17,11 @@ import java.util.stream.Collectors;
 // Demonstrates how to use Forge's config APIs
 @Mod.EventBusSubscriber(modid = Awakened.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class Config {
+    private static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
 
+    public static final ForgeConfigSpec.IntValue MAX_NIGHTBLOODS = BUILDER
+            .comment("Maximum number of Nightblood swords that can be crafted per world.")
+            .defineInRange("maxNightbloods", 1, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec SPEC = BUILDER.build();
 }

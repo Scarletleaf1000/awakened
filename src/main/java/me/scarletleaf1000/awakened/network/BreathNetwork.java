@@ -30,6 +30,8 @@ public class BreathNetwork {
                 AwakeningCommandUseC2SPacket::new, AwakeningCommandUseC2SPacket::handle);
         CHANNEL.registerMessage(id++, BreathTransferC2SPacket.class, BreathTransferC2SPacket::encode,
                 BreathTransferC2SPacket::new, BreathTransferC2SPacket::handle);
+        CHANNEL.registerMessage(id++, DestroyEvilCommandUseC2SPacket.class, DestroyEvilCommandUseC2SPacket::encode,
+                DestroyEvilCommandUseC2SPacket::new, DestroyEvilCommandUseC2SPacket::handle);
     }
 
     public static void sendToPlayer(ServerPlayer player, int breath) {

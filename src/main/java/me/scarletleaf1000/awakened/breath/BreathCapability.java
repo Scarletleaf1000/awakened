@@ -3,10 +3,10 @@ package me.scarletleaf1000.awakened.breath;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 
 public class BreathCapability implements IBreath {
     private final LivingEntity entity;
-    private int breath = 1;
 
     public BreathCapability(LivingEntity entity) {
         this.entity = entity;
@@ -14,29 +14,34 @@ public class BreathCapability implements IBreath {
 
     @Override
     public int getBreath() {
-        return breath;
+        AttributeInstance attr = entity.getAttribute(BreathAttributes.BREATH.get());
+        return attr == null ? 1 : (int) attr.getBaseValue();
     }
 
     @Override
     public void setBreath(int amount) {
-        int previous = this.breath;
-        this.breath = Math.max(0, amount);
-        if (previous != this.breath && !entity.level().isClientSide() && entity instanceof ServerPlayer serverPlayer) {
-            BreathNetwork.sendToPlayer(serverPlayer, this.breath);
+        int previous = getBreath();
+        setBreathInternal(amount);
+        int current = getBreath();
+        if (previous != current && entity.isAlive() && !entity.level().isClientSide() && entity instanceof ServerPlayer serverPlayer) {
+            BreathNetwork.sendToPlayer(serverPlayer, current);
         }
     }
 
     @Override
     public void addBreath(int amount) {
-        setBreath(breath + amount);
+        setBreath(getBreath() + amount);
     }
 
     @Override
     public void removeBreath(int amount) {
-        setBreath(Math.max(0, breath - amount));
+        setBreath(Math.max(0, getBreath() - amount));
     }
 
     void setBreathInternal(int amount) {
-        this.breath = Math.max(0, amount);
+        AttributeInstance attr = entity.getAttribute(BreathAttributes.BREATH.get());
+        if (attr != null) {
+            attr.setBaseValue(Math.max(0, amount));
+        }
     }
 }
