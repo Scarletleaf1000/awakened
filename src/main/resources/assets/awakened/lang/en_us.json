@@ -111,5 +111,6 @@
   "tooltip.awakened.contains_breath": "Contains Breath",
   "tooltip.awakened.stored_breaths": "Stored Breaths: %s",
   "trigger.awakened.passive": "Passive",
-  "trigger.awakened.passive.description": "Always activates when the command is used."
+  "trigger.awakened.passive.description": "Always activates when the command is used.",
+  "attribute.name.awakened.breath": "Breath"
 }

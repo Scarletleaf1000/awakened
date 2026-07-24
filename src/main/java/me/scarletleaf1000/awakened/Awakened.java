@@ -28,6 +28,7 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import me.scarletleaf1000.awakened.breath.BreathAttributes;
 import me.scarletleaf1000.awakened.client.AwakenedKeyMappings;
 import me.scarletleaf1000.awakened.client.screens.VillagerBreathTradeScreen;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
@@ -86,6 +87,7 @@ public class Awakened {
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         MENU_TYPES.register(modEventBus);
+        BreathAttributes.ATTRIBUTES.register(modEventBus);
 
         // Register the command subsystem registries
         CommandRegistries.register(modEventBus);
