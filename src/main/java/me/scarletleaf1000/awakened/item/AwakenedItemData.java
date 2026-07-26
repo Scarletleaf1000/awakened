@@ -24,13 +24,15 @@ public final class AwakenedItemData {
         return !stack.isEmpty() && stack.hasTag() && stack.getTag().contains(TAG_ROOT, CompoundTag.TAG_COMPOUND);
     }
 
-    public static void write(ItemStack stack, ResourceLocation triggerId, ResourceLocation actionId, ResourceLocation targetId, int storedBreath, UUID owner) {
+    public static void write(ItemStack stack, ResourceLocation triggerId, ResourceLocation actionId, ResourceLocation targetId, int storedBreath, @Nullable UUID owner) {
         CompoundTag root = new CompoundTag();
         root.putString(TAG_TRIGGER, triggerId.toString());
         root.putString(TAG_ACTION, actionId.toString());
         root.putString(TAG_TARGET, targetId.toString());
         root.putInt(TAG_BREATH, storedBreath);
-        root.putUUID(TAG_OWNER, owner);
+        if (owner != null) {
+            root.putUUID(TAG_OWNER, owner);
+        }
         if ("harden".equals(actionId.getPath()) || "resist".equals(actionId.getPath()) || "persist".equals(actionId.getPath())) {
             double multiplier = switch (actionId.getPath()) {
                 case "harden" -> 0.20D;

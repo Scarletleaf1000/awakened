@@ -106,4 +106,13 @@ public class ItemBreathStorage {
         UUID owner = getOwner(stack);
         return owner == null || owner.equals(player.getUUID());
     }
+
+    /**
+     * Returns true if the player's identity is currently blanked, meaning stored Breath should not be
+     * keyed to them. This is a hook; add the appropriate checks here if another mod or mechanic provides
+     * an identity-blanking state (for example Feruchemical aluminum or a similar Cosmere effect).
+     */
+    public static boolean isIdentityBlanked(Player player) {
+        return false;
+    }
 }

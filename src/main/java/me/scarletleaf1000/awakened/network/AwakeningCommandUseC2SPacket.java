@@ -19,6 +19,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
 public class AwakeningCommandUseC2SPacket {
@@ -68,7 +69,8 @@ public class AwakeningCommandUseC2SPacket {
                             throw new CommandBuildException(Component.translatable("message.awakened.command.insufficient_breath", storedBreath));
                         }
                         breath.removeBreath(storedBreath);
-                        AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, player.getUUID());
+                        UUID owner = ItemBreathStorage.isIdentityBlanked(player) ? null : player.getUUID();
+                        AwakenedItemData.write(held, triggerId, actionId, targetId, storedBreath, owner);
                     } else {
                         CommandContext commandCtx = new CommandContext(player, player.level());
                         command.evaluateAndExecute(commandCtx);

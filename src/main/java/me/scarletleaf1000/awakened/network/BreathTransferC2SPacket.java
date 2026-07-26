@@ -62,8 +62,8 @@ public class BreathTransferC2SPacket {
         }
         source.getCapability(BreathProvider.BREATH).ifPresent(breath -> {
             int amount = breath.getBreath();
-            ItemBreathStorage.setStoredBreath(held, amount, source.getUUID());
-            ItemBreathStorage.setOwner(held, source.getUUID());
+            UUID owner = ItemBreathStorage.isIdentityBlanked(source) ? null : source.getUUID();
+            ItemBreathStorage.setStoredBreath(held, amount, owner);
             breath.setBreath(0);
         });
     }
