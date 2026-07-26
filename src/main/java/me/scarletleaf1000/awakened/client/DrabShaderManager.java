@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -30,6 +31,14 @@ public class DrabShaderManager {
 
     public static void update(boolean shouldBeActive) {
         Minecraft mc = Minecraft.getInstance();
+        if (isShaderModActive()) {
+            if (active) {
+                mc.gameRenderer.shutdownEffect();
+                active = false;
+            }
+            return;
+        }
+
         boolean loaded = mc.gameRenderer.currentEffect() != null;
         if (active == shouldBeActive && (!shouldBeActive || loaded)) {
             return;
@@ -50,6 +59,10 @@ public class DrabShaderManager {
             }
             active = false;
         }
+    }
+
+    public static boolean isShaderModActive() {
+        return ModList.get().isLoaded("oculus") || ModList.get().isLoaded("iris");
     }
 
     @Mod.EventBusSubscriber(modid = Awakened.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
