@@ -1,6 +1,7 @@
 package me.scarletleaf1000.awakened.trade;
 
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.Config;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.breath.IBreath;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
@@ -26,8 +27,6 @@ import net.minecraftforge.network.NetworkHooks;
 
 @Mod.EventBusSubscriber(modid = Awakened.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class VillagerBreathTradeHandler {
-    private static final int MIN_COST_PER_BREATH = 32;
-    private static final int MAX_COST_PER_BREATH = 64;
     private static final String COST_TAG = "awakened:breath_trade_costs";
 
     @SubscribeEvent(priority = EventPriority.HIGH, receiveCanceled = true)
@@ -132,9 +131,11 @@ public class VillagerBreathTradeHandler {
             discountLevel = hero.getAmplifier() + 1;
         }
 
+        int minDiscountPrice = Config.BREATH_MIN_DISCOUNT_PRICE.get();
+        int discountPerLevel = Config.BREATH_DISCOUNT_PER_LEVEL.get();
         int total = 0;
         for (int base : baseCosts) {
-            total += Math.max(12, base - 8 * discountLevel);
+            total += Math.max(minDiscountPrice, base - discountPerLevel * discountLevel);
         }
         if (total > 1000) {
             total = (int) (Math.ceil(total / 9.0) * 9);
@@ -155,9 +156,13 @@ public class VillagerBreathTradeHandler {
             }
         }
 
+        int minPrice = Config.BREATH_MIN_PRICE.get();
+        int maxPrice = Config.BREATH_MAX_PRICE.get();
+        int range = Math.max(1, maxPrice - minPrice + 1);
+
         int[] costs = new int[breath];
         for (int i = 0; i < breath; i++) {
-            costs[i] = MIN_COST_PER_BREATH + villager.getRandom().nextInt(MAX_COST_PER_BREATH - MIN_COST_PER_BREATH + 1);
+            costs[i] = minPrice + villager.getRandom().nextInt(range);
         }
         tag.putIntArray(COST_TAG, costs);
         return costs;

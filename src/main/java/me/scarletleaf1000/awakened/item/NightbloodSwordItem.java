@@ -73,7 +73,7 @@ public class NightbloodSwordItem extends SwordItem {
     @Override
     public void inventoryTick(ItemStack stack, Level level, Entity entity, int slot, boolean selected) {
         super.inventoryTick(stack, level, entity, slot, selected);
-        if (!selected || !(entity instanceof Player player)) {
+        if (!selected || !(entity instanceof Player player) || player.getMainHandItem() != stack) {
             return;
         }
 

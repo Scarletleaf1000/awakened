@@ -30,6 +30,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
 
+import java.util.UUID;
+
 @Mod.EventBusSubscriber(modid = Awakened.MOD_ID)
 public class BreathEvents {
     @SubscribeEvent
@@ -186,7 +188,8 @@ public class BreathEvents {
             return;
         }
         if (AwakenedItemData.isAwakened(stack)) {
-            if (!player.getUUID().equals(AwakenedItemData.getOwner(stack))) {
+            UUID owner = AwakenedItemData.getOwner(stack);
+            if (owner != null && !player.getUUID().equals(owner)) {
                 return;
             }
             if (!event.getLevel().isClientSide()) {
@@ -201,6 +204,9 @@ public class BreathEvents {
                 int breath = ItemBreathStorage.getStoredBreath(stack);
                 player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
                 ItemBreathStorage.removeStoredBreath(stack);
+                if (stack.is(Awakened.AWAKENED_SCRAP.get())) {
+                    stack.shrink(1);
+                }
             }
         }
 

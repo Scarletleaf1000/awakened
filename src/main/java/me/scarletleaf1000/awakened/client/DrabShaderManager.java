@@ -10,6 +10,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.event.RegisterShadersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import org.slf4j.Logger;
 
@@ -30,6 +31,14 @@ public class DrabShaderManager {
 
     public static void update(boolean shouldBeActive) {
         Minecraft mc = Minecraft.getInstance();
+        if (areShadersEnabled()) {
+            if (active) {
+                mc.gameRenderer.shutdownEffect();
+                active = false;
+            }
+            return;
+        }
+
         boolean loaded = mc.gameRenderer.currentEffect() != null;
         if (active == shouldBeActive && (!shouldBeActive || loaded)) {
             return;
@@ -49,6 +58,20 @@ public class DrabShaderManager {
                 lastErrorTick = tick;
             }
             active = false;
+        }
+    }
+
+    public static boolean areShadersEnabled() {
+        if (!ModList.get().isLoaded("oculus") && !ModList.get().isLoaded("iris")) {
+            return false;
+        }
+        try {
+            Class<?> irisApi = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object instance = irisApi.getMethod("getInstance").invoke(null);
+            return (boolean) irisApi.getMethod("isShaderPackInUse").invoke(instance);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to query Iris/Oculus shader state; assuming shaders are not in use: {}", e.toString());
+            return false;
         }
     }
 

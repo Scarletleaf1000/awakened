@@ -136,7 +136,8 @@ public class HeighteningRenderHandler {
     }
 
     private static boolean shouldDesaturate(LivingEntity entity) {
-        return Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB;
+        return !DrabShaderManager.areShadersEnabled()
+                && Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB;
     }
 
     private static void renderDesaturated(LivingEntity entity, EntityRenderer renderer, float partialTick, PoseStack pose, MultiBufferSource bufferSource, int packedLight) {
@@ -489,6 +490,9 @@ public class HeighteningRenderHandler {
 
         @Override
         public VertexConsumer getBuffer(RenderType renderType) {
+            if (isOutlineRenderType(renderType)) {
+                return delegate.getBuffer(renderType);
+            }
             if (isFoilRenderType(renderType)) {
                 return NoopVertexConsumer.INSTANCE;
             }
@@ -503,6 +507,10 @@ public class HeighteningRenderHandler {
                     || renderType == RenderType.entityGlintDirect()
                     || renderType == RenderType.armorGlint()
                     || renderType == RenderType.armorEntityGlint();
+        }
+
+        private static boolean isOutlineRenderType(RenderType renderType) {
+            return renderType.toString().startsWith("entity_outline");
         }
 
         public void endBatch() {

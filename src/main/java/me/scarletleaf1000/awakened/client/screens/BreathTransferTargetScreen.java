@@ -52,7 +52,7 @@ public class BreathTransferTargetScreen extends AbstractAwakeningScreen {
         Button heldItemButton = Button.builder(Component.translatable("gui.awakened.special.my_breath_to_yours.held_item"), b -> selectHeldItem())
                 .bounds(buttonX, buttonY, 140, 20)
                 .build();
-        heldItemButton.active = !held.isEmpty() && held.getCount() == 1;
+        heldItemButton.active = !held.isEmpty() && held.getCount() == 1 && !held.is(Awakened.UNAWAKENABLE_TAG);
         this.addWidgetWithDescription(heldItemButton, Component.translatable("gui.awakened.special.my_breath_to_yours.held_item.description"));
 
         Button cancelButton = Button.builder(Component.translatable("gui.awakened.button.cancel"), b -> Minecraft.getInstance().setScreen(this.parent))

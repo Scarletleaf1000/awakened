@@ -2,8 +2,13 @@ package me.scarletleaf1000.awakened.item;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attribute;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import javax.annotation.Nullable;
 import java.util.UUID;
@@ -105,5 +110,21 @@ public class ItemBreathStorage {
         }
         UUID owner = getOwner(stack);
         return owner == null || owner.equals(player.getUUID());
+    }
+
+    /**
+     * Returns true if the entity's identity is currently blanked, meaning stored Breath should not be
+     * keyed to them. Checks the Cosmere identity attribute when available.
+     */
+    public static boolean isIdentityBlanked(LivingEntity entity) {
+        Attribute identityAttribute = ForgeRegistries.ATTRIBUTES.getValue(new ResourceLocation("cosmere", "identity"));
+        if (identityAttribute == null) {
+            return false; // Cosmere/Feruchemy not installed
+        }
+        AttributeInstance instance = entity.getAttribute(identityAttribute);
+        if (instance == null) {
+            return false;
+        }
+        return instance.getValue() <= 0.0D;
     }
 }
