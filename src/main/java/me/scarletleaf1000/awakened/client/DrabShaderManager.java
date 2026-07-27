@@ -31,7 +31,7 @@ public class DrabShaderManager {
 
     public static void update(boolean shouldBeActive) {
         Minecraft mc = Minecraft.getInstance();
-        if (isShaderModActive()) {
+        if (areShadersEnabled()) {
             if (active) {
                 mc.gameRenderer.shutdownEffect();
                 active = false;
@@ -61,8 +61,18 @@ public class DrabShaderManager {
         }
     }
 
-    public static boolean isShaderModActive() {
-        return ModList.get().isLoaded("oculus") || ModList.get().isLoaded("iris");
+    public static boolean areShadersEnabled() {
+        if (!ModList.get().isLoaded("oculus") && !ModList.get().isLoaded("iris")) {
+            return false;
+        }
+        try {
+            Class<?> irisApi = Class.forName("net.irisshaders.iris.api.v0.IrisApi");
+            Object instance = irisApi.getMethod("getInstance").invoke(null);
+            return (boolean) irisApi.getMethod("isShaderPackInUse").invoke(instance);
+        } catch (Exception e) {
+            LOGGER.warn("Failed to query Iris/Oculus shader state; assuming shaders are not in use: {}", e.toString());
+            return false;
+        }
     }
 
     @Mod.EventBusSubscriber(modid = Awakened.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)

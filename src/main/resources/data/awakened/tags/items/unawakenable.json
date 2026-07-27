@@ -116,6 +116,19 @@
     { "id": "stormward:rainspren_shardplate_chestplate", "required": false },
     { "id": "stormward:rainspren_shardplate_leggings", "required": false },
     { "id": "stormward:rainspren_shardplate_boots", "required": false },
-    { "id": "#stormward:sphere", "required": false }
+    { "id": "#stormward:sphere", "required": false },
+    { "id": "stormward:shardhammer", "required": false },
+    { "id": "stormward:grandbow", "required": false },
+    { "id": "stormward:half_shard_shield", "required": false },
+    { "id": "stormward:augmented_pickaxe", "required": false },
+    { "id": "stormward:augmented_axe", "required": false },
+    { "id": "stormward:augmented_shovel", "required": false },
+    { "id": "stormward:augmented_hoe", "required": false },
+    { "id": "stormward:regrower", "required": false },
+    { "id": "stormward:essence_detector", "required": false },
+    { "id": "stormward:soulcaster", "required": false },
+    { "id": "stormward:cultivator", "required": false },
+    { "id": "stormward:oathgate", "required": false },
+    { "id": "stormward:stormlight_tank", "required": false }
   ]
 }

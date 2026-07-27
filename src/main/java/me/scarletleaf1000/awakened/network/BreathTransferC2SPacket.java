@@ -2,6 +2,7 @@ package me.scarletleaf1000.awakened.network;
 
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
+import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import me.scarletleaf1000.awakened.item.ItemBreathStorage;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -57,7 +58,7 @@ public class BreathTransferC2SPacket {
 
     private void transferToHeldItem(ServerPlayer source) {
         ItemStack held = source.getMainHandItem();
-        if (held.isEmpty() || held.getCount() != 1 || held.is(Awakened.UNAWAKENABLE_TAG)) {
+        if (held.isEmpty() || held.getCount() != 1 || held.is(Awakened.UNAWAKENABLE_TAG) || AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
             return;
         }
         source.getCapability(BreathProvider.BREATH).ifPresent(breath -> {

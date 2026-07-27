@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 
 public class ItemStatAction implements Action {
     public enum Effect {
-        DURABILITY,
         UNBREAKABLE,
         DAMAGE,
         REACH,
@@ -75,7 +74,7 @@ public class ItemStatAction implements Action {
 
     public boolean canApplyTo(ItemStack stack) {
         return switch (effect) {
-            case DURABILITY, UNBREAKABLE -> stack.isDamageableItem();
+            case UNBREAKABLE -> stack.isDamageableItem();
             case ARMOR -> stack.getItem() instanceof ArmorItem;
             case JUMP -> stack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot() == net.minecraft.world.entity.EquipmentSlot.LEGS;
             case DAMAGE, REACH -> true;

@@ -25,9 +25,6 @@ public class CommandRegistries {
     public static final Supplier<IForgeRegistry<Target>> TARGET_REGISTRY = TARGETS.makeRegistry(RegistryBuilder::new);
 
     public static final RegistryObject<Trigger> PASSIVE = TRIGGERS.register("passive", PassiveTrigger::new);
-    public static final RegistryObject<Action> HARDEN = ACTIONS.register("harden", () -> new ItemStatAction("action.awakened.harden", 10, 2, ItemStatAction.Effect.DURABILITY, 0.20D));
-    public static final RegistryObject<Action> RESIST = ACTIONS.register("resist", () -> new ItemStatAction("action.awakened.resist", 100, 5, ItemStatAction.Effect.DURABILITY, 0.40D));
-    public static final RegistryObject<Action> PERSIST = ACTIONS.register("persist", () -> new ItemStatAction("action.awakened.persist", 300, 8, ItemStatAction.Effect.DURABILITY, 0.65D));
     public static final RegistryObject<Action> BECOME_ETERNAL = ACTIONS.register("become_eternal", () -> new ItemStatAction("action.awakened.become_eternal", 1000, 9, ItemStatAction.Effect.UNBREAKABLE, 0));
     public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new ItemStatAction("action.awakened.harm", 20, 2, ItemStatAction.Effect.DAMAGE, 0.10D));
     public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new ItemStatAction("action.awakened.wound", 200, 4, ItemStatAction.Effect.DAMAGE, 0.40D));

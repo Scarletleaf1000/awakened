@@ -121,6 +121,20 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+
+    repositories {
+        maven {
+            // Curios API
+            url = "https://maven.theillusivec4.top/"
+        }
+        maven {
+            // Cosmere + Feruchemy (Modrinth's Maven-compatible endpoint)
+            url = "https://api.modrinth.com/maven"
+            content {
+                includeGroup "maven.modrinth"
+            }
+        }
+    }
 }
 
 dependencies {

@@ -1,6 +1,7 @@
 package me.scarletleaf1000.awakened;
 
 import com.mojang.logging.LogUtils;
+import me.scarletleaf1000.awakened.item.AwakenedScrapItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
@@ -71,6 +72,8 @@ public class Awakened {
     public static final RegistryObject<Item> ROPE_COIL = ITEMS.register("rope_coil", () -> new Item(new Item.Properties().stacksTo(1)));
     public static final RegistryObject<Item> NIGHTBLOOD = ITEMS.register("nightblood",
             () -> new NightbloodSwordItem(new Item.Properties().stacksTo(1).durability(Tiers.NETHERITE.getUses())));
+    public static final RegistryObject<Item> AWAKENED_SCRAP = ITEMS.register("awakened_scrap",
+            () -> new AwakenedScrapItem(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<CreativeModeTab> AWAKENED_TAB = CREATIVE_MODE_TABS.register("awakened", () -> CreativeModeTab.builder()
             .title(Component.translatable("itemGroup.awakened"))
@@ -80,6 +83,7 @@ public class Awakened {
                 output.accept(STRAW_DOLL.get());
                 output.accept(ROPE_COIL.get());
                 output.accept(NIGHTBLOOD.get());
+                output.accept(AWAKENED_SCRAP.get());
             })
             .build());
 

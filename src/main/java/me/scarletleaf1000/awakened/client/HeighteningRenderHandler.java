@@ -136,7 +136,7 @@ public class HeighteningRenderHandler {
     }
 
     private static boolean shouldDesaturate(LivingEntity entity) {
-        return !DrabShaderManager.isShaderModActive()
+        return !DrabShaderManager.areShadersEnabled()
                 && Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB;
     }
 
