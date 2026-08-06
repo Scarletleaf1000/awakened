@@ -1,6 +1,9 @@
 package me.scarletleaf1000.awakened.breath;
 
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.Config;
+import me.scarletleaf1000.awakened.attribute.ModAttributes;
+import me.scarletleaf1000.awakened.data.NightbloodCraftedData;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
@@ -70,6 +73,8 @@ public class BreathEvents {
                 BreathNetwork.sendToPlayer(player, breath.getBreath());
             });
             ServerDrabShaderState.sync(player);
+            NightbloodCraftedData craftedData = NightbloodCraftedData.get(player.server.overworld());
+            BreathNetwork.sendNightbloodSync(player, craftedData.getCount(), Config.MAX_NIGHTBLOODS.get());
         }
     }
 
@@ -186,6 +191,14 @@ public class BreathEvents {
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.side == LogicalSide.SERVER && event.phase == TickEvent.Phase.END) {
             HeighteningEffects.tickPlayer(event.player);
+        }
+    }
+
+    @SubscribeEvent
+    public static void onBreakSpeed(PlayerEvent.BreakSpeed event) {
+        AttributeInstance attribute = event.getEntity().getAttribute(ModAttributes.MINING_SPEED.get());
+        if (attribute != null) {
+            event.setNewSpeed((float) (event.getNewSpeed() * attribute.getValue()));
         }
     }
 

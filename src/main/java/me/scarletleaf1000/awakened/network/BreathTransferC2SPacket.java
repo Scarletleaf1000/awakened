@@ -2,9 +2,12 @@ package me.scarletleaf1000.awakened.network;
 
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
+import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import me.scarletleaf1000.awakened.item.ItemBreathStorage;
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.network.NetworkEvent;
@@ -63,9 +66,11 @@ public class BreathTransferC2SPacket {
         }
         source.getCapability(BreathProvider.BREATH).ifPresent(breath -> {
             int amount = breath.getBreath();
+            int heightening = Heightening.fromBreath(amount).ordinal();
             UUID owner = ItemBreathStorage.isIdentityBlanked(source) ? null : source.getUUID();
             ItemBreathStorage.setStoredBreath(held, amount, owner);
             breath.setBreath(0);
+            announceTransfer(source, heightening);
         });
     }
 
@@ -79,8 +84,20 @@ public class BreathTransferC2SPacket {
         }
         source.getCapability(BreathProvider.BREATH).ifPresent(sourceBreath -> target.getCapability(BreathProvider.BREATH).ifPresent(targetBreath -> {
             int amount = sourceBreath.getBreath();
+            int heightening = Heightening.fromBreath(amount).ordinal();
             targetBreath.addBreath(amount);
             sourceBreath.setBreath(0);
+            announceTransfer(source, heightening);
         }));
+    }
+
+    private void announceTransfer(ServerPlayer source, int heightening) {
+        Component commandName = Component.translatable("chat.awakened.my_breath_to_yours");
+        Component announcement = Component.translatable("chat.awakened.announcement", source.getName(), commandName);
+        if (heightening == Heightening.TENTH.ordinal()) {
+            source.sendSystemMessage(announcement.copy().withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
+        } else {
+            source.server.getPlayerList().broadcastSystemMessage(announcement, false);
+        }
     }
 }

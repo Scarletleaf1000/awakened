@@ -22,6 +22,10 @@ public class ClientPacketHandlers {
         DrabShaderManager.setGloballyDisabled(disabled);
     }
 
+    public static void handleNightbloodSync(int crafted, int max) {
+        ClientNightbloodData.set(crafted, max);
+    }
+
     public static void handleVillagerTradeResult(boolean success) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen instanceof VillagerBreathTradeScreen screen) {

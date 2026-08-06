@@ -26,6 +26,7 @@
   "action.awakened.launch": "Launch",
   "action.awakened.launch.description": "Temporarily increases jump height by 3 blocks and step height by 1 block.",
   "chat.awakened.announcement": "<%s> [Awakening] %s",
+  "chat.awakened.my_breath_to_yours": "My breath to yours, my breath become yours.",
   "gui.awakened.button.back": "Back",
   "gui.awakened.button.cancel": "Cancel",
   "gui.awakened.command_builder.button.special_commands": "Special Commands",
@@ -71,6 +72,7 @@
   "gui.awakened.special.destroy_evil": "Destroy Evil",
   "gui.awakened.special.destroy_evil.description": "Transform a Netherite Sword into Nightblood.",
   "gui.awakened.special.destroy_evil.use.description": "Consume 1000 Breath and 9th Heightening to create Nightblood.",
+  "gui.awakened.special.destroy_evil.limit_reached_suffix": " (Limit Reached)",
   "gui.awakened.selection.description": "Choose a %s component.",
   "gui.awakened.selection.title": "Select %s",
   "gui.awakened.trader.breath.plural": "%s breaths",
@@ -121,5 +123,6 @@
   "tooltip.awakened.stored_breaths": "Stored Breaths: %s",
   "trigger.awakened.passive": "Passive",
   "trigger.awakened.passive.description": "Always activates when the command is used.",
-  "attribute.name.awakened.breath": "Breath"
+  "attribute.name.awakened.breath": "Breath",
+  "attribute.name.awakened.mining_speed": "Mining Speed"
 }
