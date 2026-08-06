@@ -1,6 +1,7 @@
 package me.scarletleaf1000.awakened.item;
 
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.attribute.ModAttributes;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
@@ -36,6 +37,14 @@ public final class AwakenedItemStatEvents {
                     addModifier(event, ForgeMod.ENTITY_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".entity");
                     addModifier(event, ForgeMod.BLOCK_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".block");
                 }
+                case "quicken" -> {
+                    addModifier(event, Attributes.ATTACK_SPEED, 0.25D, AttributeModifier.Operation.ADDITION, action + ".attack_speed");
+                    addModifier(event, ModAttributes.MINING_SPEED.get(), 0.5D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
+                }
+                case "hasten" -> {
+                    addModifier(event, Attributes.ATTACK_SPEED, 0.5D, AttributeModifier.Operation.ADDITION, action + ".attack_speed");
+                    addModifier(event, ModAttributes.MINING_SPEED.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
+                }
                 default -> {
                 }
             }
@@ -50,11 +59,20 @@ public final class AwakenedItemStatEvents {
             }
         }
 
+        if (event.getSlotType() == EquipmentSlot.FEET) {
+            switch (action) {
+                case "flee" -> addModifier(event, Attributes.MOVEMENT_SPEED, 0.25D, AttributeModifier.Operation.MULTIPLY_BASE, action);
+                default -> {
+                }
+            }
+        }
+
         if (event.getSlotType().isArmor() && stack.getItem() instanceof net.minecraft.world.item.ArmorItem armorItem && event.getSlotType() == armorItem.getEquipmentSlot()) {
             switch (action) {
                 case "defend" -> addModifier(event, Attributes.ARMOR, 2.0D, AttributeModifier.Operation.ADDITION, action);
                 case "ward" -> addModifier(event, Attributes.ARMOR, 4.0D, AttributeModifier.Operation.ADDITION, action);
                 case "protect" -> addModifier(event, Attributes.ARMOR, 8.0D, AttributeModifier.Operation.ADDITION, action);
+                case "toughen" -> addModifier(event, Attributes.ARMOR_TOUGHNESS, 3.0D, AttributeModifier.Operation.ADDITION, action);
                 default -> {
                 }
             }
