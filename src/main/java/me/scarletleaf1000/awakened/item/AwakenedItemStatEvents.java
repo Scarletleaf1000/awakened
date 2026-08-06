@@ -11,7 +11,6 @@ import net.minecraftforge.event.ItemAttributeModifierEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-import java.nio.charset.StandardCharsets;
 import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = Awakened.MOD_ID)
@@ -51,7 +50,7 @@ public final class AwakenedItemStatEvents {
             }
         }
 
-        if (event.getSlotType().isArmor()) {
+        if (event.getSlotType().isArmor() && stack.getItem() instanceof net.minecraft.world.item.ArmorItem armorItem && event.getSlotType() == armorItem.getEquipmentSlot()) {
             switch (action) {
                 case "defend" -> addModifier(event, Attributes.ARMOR, 2.0D, AttributeModifier.Operation.ADDITION, action);
                 case "ward" -> addModifier(event, Attributes.ARMOR, 4.0D, AttributeModifier.Operation.ADDITION, action);
@@ -63,7 +62,7 @@ public final class AwakenedItemStatEvents {
     }
 
     private static void addModifier(ItemAttributeModifierEvent event, net.minecraft.world.entity.ai.attributes.Attribute attribute, double amount, AttributeModifier.Operation operation, String name) {
-        UUID id = UUID.nameUUIDFromBytes((Awakened.MOD_ID + ":" + name).getBytes(StandardCharsets.UTF_8));
+        UUID id = UUID.randomUUID();
         event.addModifier(attribute, new AttributeModifier(id, Awakened.MOD_ID + "." + name, amount, operation));
     }
 }

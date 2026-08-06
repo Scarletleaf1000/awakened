@@ -19,6 +19,8 @@ import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.animal.WaterAnimal;
 import net.minecraft.world.entity.monster.AbstractIllager;
 import net.minecraft.world.entity.monster.Evoker;
+import net.minecraft.world.entity.monster.piglin.AbstractPiglin;
+import net.minecraft.world.entity.monster.piglin.PiglinBrute;
 import net.minecraft.world.entity.npc.AbstractVillager;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -67,6 +69,7 @@ public class BreathEvents {
             player.getCapability(BreathProvider.BREATH).ifPresent(breath -> {
                 BreathNetwork.sendToPlayer(player, breath.getBreath());
             });
+            ServerDrabShaderState.sync(player);
         }
     }
 
@@ -115,12 +118,15 @@ public class BreathEvents {
             return 0; // Drab
         }
         if (entity instanceof Animal || entity instanceof WaterAnimal) {
-            return 1;
+            return 0; // Drab
         }
         if (entity instanceof Evoker) {
             return 150; // Fifth Heightening
         }
-        if (entity instanceof AbstractVillager || entity instanceof AbstractIllager) {
+        if (entity instanceof PiglinBrute) {
+            return 100; // Fourth Heightening
+        }
+        if (canSpawnWithMultipleBreath(entity)) {
             double roll = entity.getRandom().nextDouble();
             if (roll < 0.01) {
                 return 75;
@@ -130,7 +136,13 @@ public class BreathEvents {
             }
             return 10 + entity.getRandom().nextInt(41); // 10-50
         }
-        return entity.getRandom().nextInt(2); // 0 or 1
+        return 0; // Drab
+    }
+
+    public static boolean canSpawnWithMultipleBreath(LivingEntity entity) {
+        return entity instanceof AbstractVillager
+                || entity instanceof AbstractIllager
+                || entity instanceof AbstractPiglin;
     }
 
     @SubscribeEvent
@@ -204,9 +216,6 @@ public class BreathEvents {
                 int breath = ItemBreathStorage.getStoredBreath(stack);
                 player.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(breath));
                 ItemBreathStorage.removeStoredBreath(stack);
-                if (stack.is(Awakened.AWAKENED_SCRAP.get())) {
-                    stack.shrink(1);
-                }
             }
         }
 

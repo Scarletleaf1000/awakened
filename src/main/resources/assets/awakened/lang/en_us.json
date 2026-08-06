@@ -113,8 +113,6 @@
   "message.awakened.debug.breath.add.success": "Added %s Breath to %s",
   "message.awakened.debug.breath.set.success": "Set %s's Breath to %s",
   "message.awakened.debug.breath.setentity.success": "Set Breath to %s for %s living entities",
-  "message.awakened.debug.command_test.failure": "Awakened command test failed: %s",
-  "message.awakened.debug.command_test.success": "Awakened command test fired: %s",
   "target.awakened.no_target.description": "No target is used for this command.",
   "tooltip.awakened.contains_breath": "Contains Breath",
   "tooltip.awakened.identity": "Identity: %s",

@@ -34,8 +34,11 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import me.scarletleaf1000.awakened.breath.BreathAttributes;
 import me.scarletleaf1000.awakened.client.AwakenedKeyMappings;
 import me.scarletleaf1000.awakened.client.screens.VillagerBreathTradeScreen;
+import com.mojang.serialization.Codec;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
 import me.scarletleaf1000.awakened.item.NightbloodSwordItem;
+import me.scarletleaf1000.awakened.loot.ScrapLootModifier;
+import net.minecraftforge.common.loot.IGlobalLootModifier;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
 import me.scarletleaf1000.awakened.trade.VillagerBreathTradeMenu;
 import net.minecraft.client.gui.screens.MenuScreens;
@@ -63,6 +66,12 @@ public class Awakened {
     public static final DeferredRegister<CreativeModeTab> CREATIVE_MODE_TABS = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, MOD_ID);
     // Create a Deferred Register to hold MenuTypes
     public static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MOD_ID);
+    // Create a Deferred Register to hold Global Loot Modifier codecs
+    public static final DeferredRegister<Codec<? extends IGlobalLootModifier>> LOOT_MODIFIERS =
+            DeferredRegister.create(ForgeRegistries.Keys.GLOBAL_LOOT_MODIFIER_SERIALIZERS, MOD_ID);
+
+    public static final RegistryObject<Codec<? extends IGlobalLootModifier>> SCRAP_LOOT =
+            LOOT_MODIFIERS.register("scrap_loot", () -> ScrapLootModifier.CODEC);
 
     public static final TagKey<Item> AWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "awakenable"));
     public static final TagKey<Item> UNAWAKENABLE_TAG = TagKey.create(Registries.ITEM, new ResourceLocation(MOD_ID, "unawakenable"));
@@ -93,13 +102,14 @@ public class Awakened {
     public Awakened() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
 
         // Register the deferred registers to the mod event bus
         BLOCKS.register(modEventBus);
         ITEMS.register(modEventBus);
         CREATIVE_MODE_TABS.register(modEventBus);
         MENU_TYPES.register(modEventBus);
+        LOOT_MODIFIERS.register(modEventBus);
         BreathAttributes.ATTRIBUTES.register(modEventBus);
 
         // Register the command subsystem registries

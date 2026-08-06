@@ -22,6 +22,8 @@ public class BreathNetwork {
                 BreathSyncS2CPacket::new, BreathSyncS2CPacket::handle);
         CHANNEL.registerMessage(id++, EntityBreathSyncS2CPacket.class, EntityBreathSyncS2CPacket::encode,
                 EntityBreathSyncS2CPacket::new, EntityBreathSyncS2CPacket::handle);
+        CHANNEL.registerMessage(id++, DrabShaderToggleS2CPacket.class, DrabShaderToggleS2CPacket::encode,
+                DrabShaderToggleS2CPacket::new, DrabShaderToggleS2CPacket::handle);
         CHANNEL.registerMessage(id++, VillagerTradeConfirmC2SPacket.class, VillagerTradeConfirmC2SPacket::encode,
                 VillagerTradeConfirmC2SPacket::new, VillagerTradeConfirmC2SPacket::handle);
         CHANNEL.registerMessage(id++, VillagerTradeResultS2CPacket.class, VillagerTradeResultS2CPacket::encode,
@@ -40,6 +42,10 @@ public class BreathNetwork {
 
     public static void sendEntityBreath(ServerPlayer player, int entityId, int breath) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new EntityBreathSyncS2CPacket(entityId, breath));
+    }
+
+    public static void sendDrabShaderToggle(ServerPlayer player, boolean disabled) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DrabShaderToggleS2CPacket(disabled));
     }
 
     public static void sendVillagerTradeResult(ServerPlayer player, boolean success) {

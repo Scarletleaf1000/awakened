@@ -4,8 +4,9 @@ import com.mojang.brigadier.arguments.IntegerArgumentType;
 import me.scarletleaf1000.awakened.Awakened;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
-import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -55,5 +56,15 @@ public class BreathDebugCommands {
                                             ctx.getSource().sendSuccess(() -> Component.translatable("message.awakened.debug.breath.setentity.success", amount, finalCount), false);
                                             return 1;
                                         })))));
+
+        event.getDispatcher().register(Commands.literal("disabledrabshader")
+                .requires(source -> source.hasPermission(2))
+                .executes(ctx -> {
+                    MinecraftServer server = ctx.getSource().getServer();
+                    ServerDrabShaderState.toggle(server);
+                    boolean now = ServerDrabShaderState.isDisabled();
+                    ctx.getSource().sendSuccess(() -> Component.literal("Drab shader globally " + (now ? "disabled" : "enabled")), true);
+                    return 1;
+                }));
     }
 }
