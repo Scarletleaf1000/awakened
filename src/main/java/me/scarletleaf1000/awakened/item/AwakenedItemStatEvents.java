@@ -80,7 +80,7 @@ public final class AwakenedItemStatEvents {
     }
 
     private static void addModifier(ItemAttributeModifierEvent event, net.minecraft.world.entity.ai.attributes.Attribute attribute, double amount, AttributeModifier.Operation operation, String name) {
-        UUID id = UUID.randomUUID();
+        UUID id = UUID.nameUUIDFromBytes((Awakened.MOD_ID + "." + name + "." + event.getSlotType().getName()).getBytes(java.nio.charset.StandardCharsets.UTF_8));
         event.addModifier(attribute, new AttributeModifier(id, Awakened.MOD_ID + "." + name, amount, operation));
     }
 }

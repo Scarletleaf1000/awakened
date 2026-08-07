@@ -39,6 +39,7 @@ public class CommandRegistries {
     public static final RegistryObject<Action> QUICKEN = ACTIONS.register("quicken", () -> new ItemStatAction("action.awakened.quicken", 200, 6, ItemStatAction.Effect.ATTACK_AND_MINING_SPEED, 0.25D, 0.5D));
     public static final RegistryObject<Action> HASTEN = ACTIONS.register("hasten", () -> new ItemStatAction("action.awakened.hasten", 500, 8, ItemStatAction.Effect.ATTACK_AND_MINING_SPEED, 0.5D, 1.0D));
     public static final RegistryObject<Action> TOUGHEN = ACTIONS.register("toughen", () -> new ItemStatAction("action.awakened.toughen", 350, 7, ItemStatAction.Effect.TOUGHNESS, 3.0D));
+    public static final RegistryObject<Action> HIDE = ACTIONS.register("hide", () -> new ItemStatAction("action.awakened.hide", 100, 10, ItemStatAction.Effect.HIDE, 0.0D));
     public static final ResourceLocation NO_TARGET_ID = new ResourceLocation(Awakened.MOD_ID, "no_target");
     public static final RegistryObject<Target> NO_TARGET = TARGETS.register(NO_TARGET_ID.getPath(), NoTarget::new);
 

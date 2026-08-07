@@ -33,6 +33,8 @@
   "action.awakened.hasten.description": "Temporarily increases main-hand attack speed by 0.5 and mining speed by 100%.",
   "action.awakened.toughen": "Toughen",
   "action.awakened.toughen.description": "Temporarily adds 3 armor toughness while worn.",
+  "action.awakened.hide": "Hide",
+  "action.awakened.hide.description": "Temporarily makes armor invisible while worn.",
   "chat.awakened.announcement": "<%s> [Awakening] %s",
   "chat.awakened.my_breath_to_yours": "My breath to yours, my breath become yours.",
   "gui.awakened.button.back": "Back",

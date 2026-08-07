@@ -16,7 +16,8 @@ public class ItemStatAction implements Action {
         TOUGHNESS,
         JUMP,
         SPEED,
-        ATTACK_AND_MINING_SPEED
+        ATTACK_AND_MINING_SPEED,
+        HIDE
     }
 
     private final String translationKey;
@@ -88,7 +89,7 @@ public class ItemStatAction implements Action {
     public boolean canApplyTo(ItemStack stack) {
         return switch (effect) {
             case UNBREAKABLE -> stack.isDamageableItem();
-            case ARMOR, TOUGHNESS -> stack.getItem() instanceof ArmorItem;
+            case ARMOR, TOUGHNESS, HIDE -> stack.getItem() instanceof ArmorItem;
             case JUMP -> stack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot() == net.minecraft.world.entity.EquipmentSlot.LEGS;
             case SPEED -> stack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot() == net.minecraft.world.entity.EquipmentSlot.FEET;
             case DAMAGE, REACH, ATTACK_AND_MINING_SPEED -> true;
