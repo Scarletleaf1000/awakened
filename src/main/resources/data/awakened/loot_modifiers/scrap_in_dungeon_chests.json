@@ -14,9 +14,9 @@
     },
     {
       "condition": "minecraft:random_chance",
-      "chance": 0.25
+      "chance": 0.1
     }
   ],
   "minBreath": 20,
-  "maxBreath": 70
+  "maxBreath": 50
 }
