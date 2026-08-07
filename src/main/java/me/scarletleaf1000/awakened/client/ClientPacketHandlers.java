@@ -18,6 +18,14 @@ public class ClientPacketHandlers {
         ClientBreathData.set(entityId, breath);
     }
 
+    public static void handleDrabShaderToggle(boolean disabled) {
+        DrabShaderManager.setGloballyDisabled(disabled);
+    }
+
+    public static void handleNightbloodSync(int crafted, int max) {
+        ClientNightbloodData.set(crafted, max);
+    }
+
     public static void handleVillagerTradeResult(boolean success) {
         Minecraft mc = Minecraft.getInstance();
         if (mc.screen instanceof VillagerBreathTradeScreen screen) {

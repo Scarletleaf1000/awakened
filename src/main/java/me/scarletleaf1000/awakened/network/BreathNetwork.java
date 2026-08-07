@@ -22,6 +22,8 @@ public class BreathNetwork {
                 BreathSyncS2CPacket::new, BreathSyncS2CPacket::handle);
         CHANNEL.registerMessage(id++, EntityBreathSyncS2CPacket.class, EntityBreathSyncS2CPacket::encode,
                 EntityBreathSyncS2CPacket::new, EntityBreathSyncS2CPacket::handle);
+        CHANNEL.registerMessage(id++, DrabShaderToggleS2CPacket.class, DrabShaderToggleS2CPacket::encode,
+                DrabShaderToggleS2CPacket::new, DrabShaderToggleS2CPacket::handle);
         CHANNEL.registerMessage(id++, VillagerTradeConfirmC2SPacket.class, VillagerTradeConfirmC2SPacket::encode,
                 VillagerTradeConfirmC2SPacket::new, VillagerTradeConfirmC2SPacket::handle);
         CHANNEL.registerMessage(id++, VillagerTradeResultS2CPacket.class, VillagerTradeResultS2CPacket::encode,
@@ -32,6 +34,8 @@ public class BreathNetwork {
                 BreathTransferC2SPacket::new, BreathTransferC2SPacket::handle);
         CHANNEL.registerMessage(id++, DestroyEvilCommandUseC2SPacket.class, DestroyEvilCommandUseC2SPacket::encode,
                 DestroyEvilCommandUseC2SPacket::new, DestroyEvilCommandUseC2SPacket::handle);
+        CHANNEL.registerMessage(id++, NightbloodSyncS2CPacket.class, NightbloodSyncS2CPacket::encode,
+                NightbloodSyncS2CPacket::new, NightbloodSyncS2CPacket::handle);
     }
 
     public static void sendToPlayer(ServerPlayer player, int breath) {
@@ -42,7 +46,19 @@ public class BreathNetwork {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new EntityBreathSyncS2CPacket(entityId, breath));
     }
 
+    public static void sendDrabShaderToggle(ServerPlayer player, boolean disabled) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new DrabShaderToggleS2CPacket(disabled));
+    }
+
     public static void sendVillagerTradeResult(ServerPlayer player, boolean success) {
         CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new VillagerTradeResultS2CPacket(success));
+    }
+
+    public static void sendNightbloodSync(ServerPlayer player, int crafted, int max) {
+        CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new NightbloodSyncS2CPacket(crafted, max));
+    }
+
+    public static void broadcastNightbloodSync(int crafted, int max) {
+        CHANNEL.send(PacketDistributor.ALL.noArg(), new NightbloodSyncS2CPacket(crafted, max));
     }
 }

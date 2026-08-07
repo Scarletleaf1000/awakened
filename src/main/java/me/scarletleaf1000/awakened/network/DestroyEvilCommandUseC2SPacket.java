@@ -81,6 +81,7 @@ public class DestroyEvilCommandUseC2SPacket {
 
                 player.setItemInHand(net.minecraft.world.InteractionHand.MAIN_HAND, nightblood);
                 craftedData.increment();
+                BreathNetwork.broadcastNightbloodSync(craftedData.getCount(), Config.MAX_NIGHTBLOODS.get());
 
                 Component commandName = SpecialCommand.DESTROY_EVIL.getDisplayName();
                 Component announcement = Component.translatable("chat.awakened.announcement", player.getName(), commandName);

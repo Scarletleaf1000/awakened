@@ -4,6 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.logging.LogUtils;
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.breath.BreathEvents;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import me.scarletleaf1000.awakened.heightening.Heightening;
 import net.minecraft.client.Minecraft;
@@ -16,6 +17,7 @@ import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ClipContext;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -31,9 +33,11 @@ import net.minecraftforge.fml.util.ObfuscationReflectionHelper;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.client.event.RenderPlayerEvent;
+import net.minecraftforge.client.event.RenderNameTagEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.TickEvent.RenderTickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = Awakened.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -135,8 +139,36 @@ public class HeighteningRenderHandler {
         renderHeighteningLabel(event.getEntity(), event.getPartialTick(), event.getPoseStack(), event.getMultiBufferSource());
     }
 
+    @SubscribeEvent
+    public static void onRenderNameTag(RenderNameTagEvent event) {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) {
+            return;
+        }
+
+        if (!(event.getEntity() instanceof Player target) || target == mc.player) {
+            return;
+        }
+
+        int ownBreath = mc.player.getCapability(BreathProvider.BREATH)
+                .map(b -> b.getBreath())
+                .orElse(1);
+        if (Heightening.fromBreath(ownBreath) != Heightening.DRAB) {
+            return;
+        }
+
+        Vec3 camera = mc.gameRenderer.getMainCamera().getPosition();
+        Vec3 tagPos = target.getPosition(event.getPartialTick()).add(0, target.getBbHeight() + 0.5, 0);
+        HitResult trace = mc.level.clip(new ClipContext(camera, tagPos,
+                ClipContext.Block.COLLIDER, ClipContext.Fluid.NONE, mc.player));
+        if (trace.getType() == HitResult.Type.BLOCK
+                && camera.distanceToSqr(trace.getLocation()) < camera.distanceToSqr(tagPos) - 1.0) {
+            event.setResult(Event.Result.DENY);
+        }
+    }
     private static boolean shouldDesaturate(LivingEntity entity) {
         return !DrabShaderManager.areShadersEnabled()
+                && BreathEvents.canSpawnWithMultipleBreath(entity)
                 && Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB;
     }
 
@@ -167,6 +199,9 @@ public class HeighteningRenderHandler {
                 .map(b -> b.getBreath())
                 .orElse(1);
         if (Heightening.fromBreath(ownBreath).ordinal() < Heightening.FIRST.ordinal()) {
+            return;
+        }
+        if (!BreathEvents.canSpawnWithMultipleBreath(target)) {
             return;
         }
         if (target.isInvisible()) {
@@ -290,7 +325,8 @@ public class HeighteningRenderHandler {
                     continue;
                 }
 
-                if (Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB) {
+                if (Heightening.fromBreath(ClientBreathData.get(entity.getId())) == Heightening.DRAB
+                        && (entity instanceof net.minecraft.world.entity.player.Player || (entity instanceof net.minecraft.world.entity.LivingEntity living && me.scarletleaf1000.awakened.breath.BreathEvents.canSpawnWithMultipleBreath(living)))) {
                     continue;
                 }
 

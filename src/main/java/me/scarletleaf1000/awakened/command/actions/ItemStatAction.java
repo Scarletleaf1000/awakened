@@ -13,7 +13,11 @@ public class ItemStatAction implements Action {
         DAMAGE,
         REACH,
         ARMOR,
-        JUMP
+        TOUGHNESS,
+        JUMP,
+        SPEED,
+        ATTACK_AND_MINING_SPEED,
+        HIDE
     }
 
     private final String translationKey;
@@ -21,13 +25,19 @@ public class ItemStatAction implements Action {
     private final int minHeightening;
     private final Effect effect;
     private final double amount;
+    private final double secondaryAmount;
 
     public ItemStatAction(String translationKey, int cost, int minHeightening, Effect effect, double amount) {
+        this(translationKey, cost, minHeightening, effect, amount, 0.0D);
+    }
+
+    public ItemStatAction(String translationKey, int cost, int minHeightening, Effect effect, double amount, double secondaryAmount) {
         this.translationKey = translationKey;
         this.cost = cost;
         this.minHeightening = minHeightening;
         this.effect = effect;
         this.amount = amount;
+        this.secondaryAmount = secondaryAmount;
     }
 
     @Override
@@ -72,12 +82,17 @@ public class ItemStatAction implements Action {
         return amount;
     }
 
+    public double getSecondaryAmount() {
+        return secondaryAmount;
+    }
+
     public boolean canApplyTo(ItemStack stack) {
         return switch (effect) {
             case UNBREAKABLE -> stack.isDamageableItem();
-            case ARMOR -> stack.getItem() instanceof ArmorItem;
+            case ARMOR, TOUGHNESS, HIDE -> stack.getItem() instanceof ArmorItem;
             case JUMP -> stack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot() == net.minecraft.world.entity.EquipmentSlot.LEGS;
-            case DAMAGE, REACH -> true;
+            case SPEED -> stack.getItem() instanceof ArmorItem armor && armor.getEquipmentSlot() == net.minecraft.world.entity.EquipmentSlot.FEET;
+            case DAMAGE, REACH, ATTACK_AND_MINING_SPEED -> true;
         };
     }
 }

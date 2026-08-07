@@ -2,6 +2,7 @@ package me.scarletleaf1000.awakened.client.screens;
 
 import me.scarletleaf1000.awakened.Awakened;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
+import me.scarletleaf1000.awakened.client.ClientNightbloodData;
 import me.scarletleaf1000.awakened.command.Action;
 import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandRegistries;
@@ -212,6 +213,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
         if (getAvailableHeightening() < Heightening.NINTH.ordinal()) {
             return Component.translatable("gui.awakened.command_builder.use.heightening_required", Heightening.NINTH.ordinal());
         }
+        if (ClientNightbloodData.isLimitReached()) {
+            return Component.translatable("message.awakened.destroy_evil.limit_reached");
+        }
         return Component.translatable("gui.awakened.special.destroy_evil.use.description");
     }
 
@@ -345,6 +349,9 @@ public class AwakeningCommandBuilderScreen extends AbstractAwakeningScreen {
                 return false;
             }
             if (AwakenedItemData.isAwakened(held) || ItemBreathStorage.hasStoredBreath(held)) {
+                return false;
+            }
+            if (ClientNightbloodData.isLimitReached()) {
                 return false;
             }
             return getAvailableHeightening() >= Heightening.NINTH.ordinal();

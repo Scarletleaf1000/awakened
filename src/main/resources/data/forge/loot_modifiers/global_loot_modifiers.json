@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "entries": [
+    "awakened:scrap_in_common_chests",
+    "awakened:scrap_in_dungeon_chests",
+    "awakened:scrap_in_treasure_chests",
+    "awakened:scrap_in_bastion_mansion_chests",
+    "awakened:scrap_in_high_tier_chests"
+  ]
+}

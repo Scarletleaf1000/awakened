@@ -27,9 +27,24 @@ public class DrabShaderManager {
     private static final ResourceLocation DRAB_SHADER = new ResourceLocation(Awakened.MOD_ID, "shaders/post/drab.json");
 
     private static boolean active = false;
+    private static boolean globallyDisabled = false;
     private static long lastErrorTick = Long.MIN_VALUE;
 
+    public static void setGloballyDisabled(boolean disabled) {
+        if (globallyDisabled != disabled) {
+            globallyDisabled = disabled;
+            update(false);
+        }
+    }
+
+    public static boolean isGloballyDisabled() {
+        return globallyDisabled;
+    }
+
     public static void update(boolean shouldBeActive) {
+        if (globallyDisabled) {
+            shouldBeActive = false;
+        }
         Minecraft mc = Minecraft.getInstance();
         if (areShadersEnabled()) {
             if (active) {
