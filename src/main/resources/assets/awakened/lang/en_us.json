@@ -111,6 +111,7 @@
   "item.awakened.wood_doll": "Wooden Doll",
   "item.awakened.nightblood": "Nightblood",
   "item.awakened.nightblood.stored_breath": "Breaths: %s",
+  "item.awakened.nightblood.give_breaths": "Shift + Right-Click to Give Breaths.",
   "item.awakened.awakened_scrap": "Awakened Scrap",
   "itemGroup.awakened": "Awakened",
   "key.awakened.open_awakening": "Open Awakening GUI",

@@ -14,11 +14,14 @@ import net.minecraft.world.entity.ai.attributes.Attribute;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.SwordItem;
 import net.minecraft.world.item.Tiers;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.UseAnim;
 import net.minecraft.world.level.Level;
 
 import javax.annotation.Nullable;
@@ -27,6 +30,8 @@ import java.util.List;
 public class NightbloodSwordItem extends SwordItem {
     private static final String TAG_STORED_BREATH = "awakened:nightblood_stored_breath";
     private static final int DRAIN_INTERVAL = 30; // 1.5 seconds
+    private static final int FAST_DRAIN_INTERVAL = 1; // every tick, while shift + right-click held
+    private static final int USE_DURATION = 72000; // effectively indefinite, ends on release
     private static final int WITHER_DURATION = 40; // 2 seconds
     private static final int WITHER_AMPLIFIER = 2; // Wither III
     private static final double DAMAGE_MULTIPLIER = 0.28D;
@@ -39,6 +44,26 @@ public class NightbloodSwordItem extends SwordItem {
     @Override
     public boolean isDamageable(ItemStack stack) {
         return false;
+    }
+
+    @Override
+    public InteractionResultHolder<ItemStack> use(Level level, Player player, InteractionHand hand) {
+        ItemStack stack = player.getItemInHand(hand);
+        if (hand == InteractionHand.MAIN_HAND && player.isShiftKeyDown()) {
+            player.startUsingItem(hand);
+            return InteractionResultHolder.consume(stack);
+        }
+        return InteractionResultHolder.pass(stack);
+    }
+
+    @Override
+    public int getUseDuration(ItemStack stack) {
+        return USE_DURATION;
+    }
+
+    @Override
+    public UseAnim getUseAnimation(ItemStack stack) {
+        return UseAnim.BOW;
     }
 
     public static int getStoredBreath(ItemStack stack) {
@@ -79,7 +104,9 @@ public class NightbloodSwordItem extends SwordItem {
 
         if (!level.isClientSide() && level instanceof ServerLevel serverLevel) {
             spawnSmokeParticles(serverLevel, player);
-            if (level.getGameTime() % DRAIN_INTERVAL == 0) {
+            boolean giving = player.isUsingItem() && player.getUsedItemHand() == InteractionHand.MAIN_HAND && player.getUseItem() == stack;
+            int interval = giving ? FAST_DRAIN_INTERVAL : DRAIN_INTERVAL;
+            if (level.getGameTime() % interval == 0) {
                 player.getCapability(BreathProvider.BREATH).ifPresent(breath -> {
                     if (breath.getBreath() > 0) {
                         breath.removeBreath(1);
@@ -95,6 +122,7 @@ public class NightbloodSwordItem extends SwordItem {
     @Override
     public void appendHoverText(ItemStack stack, @Nullable Level level, List<Component> tooltip, TooltipFlag flag) {
         tooltip.add(Component.translatable("item.awakened.nightblood.stored_breath", getStoredBreath(stack)));
+        tooltip.add(Component.translatable("item.awakened.nightblood.give_breaths"));
     }
 
     private void spawnSmokeParticles(ServerLevel level, Player player) {
