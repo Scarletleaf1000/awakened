@@ -178,10 +178,10 @@ public class BreathEvents {
             int victimBreath = victim.getCapability(BreathProvider.BREATH)
                     .map(IBreath::getBreath)
                     .orElse(0);
-            if (victimBreath < 20) {
+            int transfer = Math.round((victimBreath * (float) victimBreath) / 500f);
+            if (transfer <= 0) {
                 return;
             }
-            int transfer = victimBreath / 20;
             victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
             killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
         }
