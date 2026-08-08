@@ -8,9 +8,12 @@ import me.scarletleaf1000.awakened.heightening.Heightening;
 import me.scarletleaf1000.awakened.heightening.HeighteningEffects;
 import me.scarletleaf1000.awakened.item.AwakenedItemData;
 import me.scarletleaf1000.awakened.item.ItemBreathStorage;
+import me.scarletleaf1000.awakened.item.NightbloodSwordItem;
 import me.scarletleaf1000.awakened.network.BreathNetwork;
+import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +33,7 @@ import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
+import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
@@ -76,6 +80,18 @@ public class BreathEvents {
             NightbloodCraftedData craftedData = NightbloodCraftedData.get(player.server.overworld());
             BreathNetwork.sendNightbloodSync(player, craftedData.getCount(), Config.MAX_NIGHTBLOODS.get());
         }
+    }
+
+    @SubscribeEvent
+    public static void onItemPickup(EntityItemPickupEvent event) {
+        if (event.getEntity().level().isClientSide()) {
+            return;
+        }
+        if (!event.getItem().getItem().is(Awakened.NIGHTBLOOD.get())) {
+            return;
+        }
+        event.getEntity().sendSystemMessage(Component.translatable("message.awakened.nightblood.pickup_greeting")
+                .withStyle(ChatFormatting.GRAY, ChatFormatting.ITALIC));
     }
 
     @SubscribeEvent
@@ -174,7 +190,7 @@ public class BreathEvents {
                     int nightbloodShare = totalStolen - transfer;
                     victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(totalStolen));
                     killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
-                    addStoredBreathToNightblood(mainHand, nightbloodShare, killerPlayer);
+                    addStoredBreathToNightblood(mainHand, nightbloodShare);
                 } else {
                     victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
                     killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
@@ -197,7 +213,7 @@ public class BreathEvents {
                 int nightbloodShare = totalStolen - transfer;
                 victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(totalStolen));
                 killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
-                addStoredBreathToNightblood(mainHand, nightbloodShare, killerPlayer);
+                addStoredBreathToNightblood(mainHand, nightbloodShare);
             } else {
                 victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
                 killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
@@ -205,9 +221,9 @@ public class BreathEvents {
         }
     }
 
-    private static void addStoredBreathToNightblood(ItemStack nightblood, int amount, Player owner) {
-        int current = ItemBreathStorage.getStoredBreath(nightblood);
-        ItemBreathStorage.setStoredBreath(nightblood, current + amount, owner.getUUID());
+    private static void addStoredBreathToNightblood(ItemStack nightblood, int amount) {
+        int current = NightbloodSwordItem.getStoredBreath(nightblood);
+        NightbloodSwordItem.setStoredBreath(nightblood, current + amount);
     }
 
     @SubscribeEvent

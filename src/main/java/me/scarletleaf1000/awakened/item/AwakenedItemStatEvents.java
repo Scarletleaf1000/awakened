@@ -30,20 +30,20 @@ public final class AwakenedItemStatEvents {
         String action = actionId.getPath();
         if (event.getSlotType() == EquipmentSlot.MAINHAND) {
             switch (action) {
-                case "harm" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.10D, AttributeModifier.Operation.MULTIPLY_BASE, action);
-                case "wound" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.40D, AttributeModifier.Operation.MULTIPLY_BASE, action);
-                case "destroy" -> addModifier(event, Attributes.ATTACK_DAMAGE, 1.00D, AttributeModifier.Operation.MULTIPLY_BASE, action);
+                case "harm" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.5D, AttributeModifier.Operation.MULTIPLY_BASE, action);
+                case "wound" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.20D, AttributeModifier.Operation.MULTIPLY_BASE, action);
+                case "destroy" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.50D, AttributeModifier.Operation.MULTIPLY_BASE, action);
                 case "reach" -> {
                     addModifier(event, ForgeMod.ENTITY_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".entity");
                     addModifier(event, ForgeMod.BLOCK_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".block");
                 }
                 case "quicken" -> {
                     addModifier(event, Attributes.ATTACK_SPEED, 0.25D, AttributeModifier.Operation.ADDITION, action + ".attack_speed");
-                    addModifier(event, ModAttributes.MINING_SPEED.get(), 0.5D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
+                    addModifier(event, ModAttributes.MINING_SPEED.get(), 0.35D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
                 }
                 case "hasten" -> {
                     addModifier(event, Attributes.ATTACK_SPEED, 0.5D, AttributeModifier.Operation.ADDITION, action + ".attack_speed");
-                    addModifier(event, ModAttributes.MINING_SPEED.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
+                    addModifier(event, ModAttributes.MINING_SPEED.get(), 0.75D, AttributeModifier.Operation.ADDITION, action + ".mining_speed");
                 }
                 default -> {
                 }
@@ -72,7 +72,7 @@ public final class AwakenedItemStatEvents {
                 case "defend" -> addModifier(event, Attributes.ARMOR, 2.0D, AttributeModifier.Operation.ADDITION, action);
                 case "ward" -> addModifier(event, Attributes.ARMOR, 4.0D, AttributeModifier.Operation.ADDITION, action);
                 case "protect" -> addModifier(event, Attributes.ARMOR, 8.0D, AttributeModifier.Operation.ADDITION, action);
-                case "toughen" -> addModifier(event, Attributes.ARMOR_TOUGHNESS, 3.0D, AttributeModifier.Operation.ADDITION, action);
+                case "toughen" -> addModifier(event, Attributes.ARMOR_TOUGHNESS, 5.0D, AttributeModifier.Operation.ADDITION, action);
                 default -> {
                 }
             }
