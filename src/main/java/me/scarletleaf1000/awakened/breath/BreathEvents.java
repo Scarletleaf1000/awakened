@@ -168,8 +168,15 @@ public class BreathEvents {
 
             if (killer instanceof Player killerPlayer) {
                 int transfer = Math.max(1, victimBreath / 5);
-                victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
-                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+                ItemStack mainHand = killerPlayer.getMainHandItem();
+                if (mainHand.is(Awakened.NIGHTBLOOD.get())) {
+                    victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer * 2));
+                    killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+                    addStoredBreathToNightblood(mainHand, transfer, killerPlayer);
+                } else {
+                    victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
+                    killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+                }
             } else {
                 int loss = Math.min(25, Math.max(1, victimBreath / 20));
                 victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(loss));
@@ -182,9 +189,21 @@ public class BreathEvents {
             if (transfer <= 0) {
                 return;
             }
-            victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
-            killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+            ItemStack mainHand = killerPlayer.getMainHandItem();
+            if (mainHand.is(Awakened.NIGHTBLOOD.get())) {
+                victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer * 2));
+                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+                addStoredBreathToNightblood(mainHand, transfer, killerPlayer);
+            } else {
+                victim.getCapability(BreathProvider.BREATH).ifPresent(b -> b.removeBreath(transfer));
+                killerPlayer.getCapability(BreathProvider.BREATH).ifPresent(b -> b.addBreath(transfer));
+            }
         }
+    }
+
+    private static void addStoredBreathToNightblood(ItemStack nightblood, int amount, Player owner) {
+        int current = ItemBreathStorage.getStoredBreath(nightblood);
+        ItemBreathStorage.setStoredBreath(nightblood, current + amount, owner.getUUID());
     }
 
     @SubscribeEvent
