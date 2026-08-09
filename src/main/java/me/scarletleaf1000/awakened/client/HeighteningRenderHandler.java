@@ -195,13 +195,17 @@ public class HeighteningRenderHandler {
             return;
         }
 
+        if (target == mc.player) {
+            return;
+        }
+
         int ownBreath = mc.player.getCapability(BreathProvider.BREATH)
                 .map(b -> b.getBreath())
                 .orElse(1);
         if (Heightening.fromBreath(ownBreath).ordinal() < Heightening.FIRST.ordinal()) {
             return;
         }
-        if (!BreathEvents.canSpawnWithMultipleBreath(target)) {
+        if (!(target instanceof Player) && !BreathEvents.canSpawnWithMultipleBreath(target)) {
             return;
         }
         if (target.isInvisible()) {
@@ -217,7 +221,7 @@ public class HeighteningRenderHandler {
             return;
         }
 
-        int breath = target == mc.player ? ownBreath : ClientBreathData.get(target.getId());
+        int breath = ClientBreathData.get(target.getId());
         Heightening heightening = Heightening.fromBreath(breath);
         FormattedCharSequence text = heightening.getDisplayName().getVisualOrderText();
 
