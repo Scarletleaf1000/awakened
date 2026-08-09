@@ -26,9 +26,9 @@ public class CommandRegistries {
 
     public static final RegistryObject<Trigger> PASSIVE = TRIGGERS.register("passive", PassiveTrigger::new);
     public static final RegistryObject<Action> BECOME_ETERNAL = ACTIONS.register("become_eternal", () -> new ItemStatAction("action.awakened.become_eternal", 1000, 9, ItemStatAction.Effect.UNBREAKABLE, 0));
-    public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new ItemStatAction("action.awakened.harm", 20, 2, ItemStatAction.Effect.DAMAGE, 0.5D));
-    public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new ItemStatAction("action.awakened.wound", 200, 4, ItemStatAction.Effect.DAMAGE, 0.20D));
-    public static final RegistryObject<Action> DESTROY = ACTIONS.register("destroy", () -> new ItemStatAction("action.awakened.destroy", 1000, 10, ItemStatAction.Effect.DAMAGE, 0.50D));
+    public static final RegistryObject<Action> HARM = ACTIONS.register("harm", () -> new ItemStatAction("action.awakened.harm", 20, 2, ItemStatAction.Effect.DAMAGE, 1.0D));
+    public static final RegistryObject<Action> WOUND = ACTIONS.register("wound", () -> new ItemStatAction("action.awakened.wound", 200, 4, ItemStatAction.Effect.DAMAGE, 2.0D));
+    public static final RegistryObject<Action> DESTROY = ACTIONS.register("destroy", () -> new ItemStatAction("action.awakened.destroy", 1000, 10, ItemStatAction.Effect.DAMAGE, 5.0D));
     public static final RegistryObject<Action> REACH = ACTIONS.register("reach", () -> new ItemStatAction("action.awakened.reach", 200, 4, ItemStatAction.Effect.REACH, 1.0D));
     public static final RegistryObject<Action> DEFEND = ACTIONS.register("defend", () -> new ItemStatAction("action.awakened.defend", 50, 3, ItemStatAction.Effect.ARMOR, 2.0D));
     public static final RegistryObject<Action> WARD = ACTIONS.register("ward", () -> new ItemStatAction("action.awakened.ward", 200, 5, ItemStatAction.Effect.ARMOR, 4.0D));

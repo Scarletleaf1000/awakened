@@ -30,9 +30,9 @@ public final class AwakenedItemStatEvents {
         String action = actionId.getPath();
         if (event.getSlotType() == EquipmentSlot.MAINHAND) {
             switch (action) {
-                case "harm" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.5D, AttributeModifier.Operation.MULTIPLY_BASE, action);
-                case "wound" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.20D, AttributeModifier.Operation.MULTIPLY_BASE, action);
-                case "destroy" -> addModifier(event, Attributes.ATTACK_DAMAGE, 0.50D, AttributeModifier.Operation.MULTIPLY_BASE, action);
+                case "harm" -> addModifier(event, Attributes.ATTACK_DAMAGE, 1.0D, AttributeModifier.Operation.ADDITION, action);
+                case "wound" -> addModifier(event, Attributes.ATTACK_DAMAGE, 2.0D, AttributeModifier.Operation.ADDITION, action);
+                case "destroy" -> addModifier(event, Attributes.ATTACK_DAMAGE, 5.0D, AttributeModifier.Operation.ADDITION, action);
                 case "reach" -> {
                     addModifier(event, ForgeMod.ENTITY_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".entity");
                     addModifier(event, ForgeMod.BLOCK_REACH.get(), 1.0D, AttributeModifier.Operation.ADDITION, action + ".block");
