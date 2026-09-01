@@ -4,21 +4,22 @@ package me.scarletleaf1000.awakened.heightening;
  * Heightening tiers from Warbreaker. Tiers are unlocked by reaching the
  * required Breath threshold. Values 1-9 have no tier; 0 is Drab.
  */
+import me.scarletleaf1000.awakened.Config;
 import net.minecraft.network.chat.Component;
 
 public enum Heightening {
     DRAB(0, "heightening.awakened.drab"),
     NO_HEIGHTENING(1, "heightening.awakened.none"),
-    FIRST(10, "heightening.awakened.first"),
-    SECOND(25, "heightening.awakened.second"),
-    THIRD(50, "heightening.awakened.third"),
-    FOURTH(100, "heightening.awakened.fourth"),
-    FIFTH(150, "heightening.awakened.fifth"),
-    SIXTH(250, "heightening.awakened.sixth"),
-    SEVENTH(400, "heightening.awakened.seventh"),
-    EIGHTH(600, "heightening.awakened.eighth"),
-    NINTH(1000, "heightening.awakened.ninth"),
-    TENTH(2000, "heightening.awakened.tenth");
+    FIRST(getThresholdFromConfig(1), "heightening.awakened.first"),
+    SECOND(getThresholdFromConfig(2), "heightening.awakened.second"),
+    THIRD(getThresholdFromConfig(3), "heightening.awakened.third"),
+    FOURTH(getThresholdFromConfig(4), "heightening.awakened.fourth"),
+    FIFTH(getThresholdFromConfig(5), "heightening.awakened.fifth"),
+    SIXTH(getThresholdFromConfig(6), "heightening.awakened.sixth"),
+    SEVENTH(getThresholdFromConfig(7), "heightening.awakened.seventh"),
+    EIGHTH(getThresholdFromConfig(8), "heightening.awakened.eighth"),
+    NINTH(getThresholdFromConfig(9), "heightening.awakened.ninth"),
+    TENTH(getThresholdFromConfig(10), "heightening.awakened.tenth");
 
     private final int threshold;
     private final String displayNameKey;
@@ -51,5 +52,21 @@ public enum Heightening {
             }
         }
         return result;
+    }
+
+    public static int getThresholdFromConfig(int heightening) {
+        return switch (heightening) {
+            default -> Integer.MAX_VALUE;
+            case 1 -> Config.HEIGHTENING_THRESHOLD_FIRST.get();
+            case 2 -> Config.HEIGHTENING_THRESHOLD_SECOND.get();
+            case 3 -> Config.HEIGHTENING_THRESHOLD_THIRD.get();
+            case 4 -> Config.HEIGHTENING_THRESHOLD_FOURTH.get();
+            case 5 -> Config.HEIGHTENING_THRESHOLD_FIFTH.get();
+            case 6 -> Config.HEIGHTENING_THRESHOLD_SIXTH.get();
+            case 7 -> Config.HEIGHTENING_THRESHOLD_SEVENTH.get();
+            case 8 -> Config.HEIGHTENING_THRESHOLD_EIGHTH.get();
+            case 9 -> Config.HEIGHTENING_THRESHOLD_NINTH.get();
+            case 10 -> Config.HEIGHTENING_THRESHOLD_TENTH.get();
+        };
     }
 }

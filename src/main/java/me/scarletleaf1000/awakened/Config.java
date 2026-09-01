@@ -40,5 +40,45 @@ public class Config {
             .comment("Emerald discount applied per Hero of the Village level when purchasing Breath.")
             .defineInRange("breathDiscountPerLevel", 8, 0, Integer.MAX_VALUE);
 
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_FIRST = BUILDER
+            .comment("The amount of breaths required for the first heightening.")
+            .defineInRange("heighteningThresholdFirst", 10, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_SECOND = BUILDER
+            .comment("The amount of breaths required for the second heightening.")
+            .defineInRange("heighteningThresholdSecond", 25, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_THIRD = BUILDER
+            .comment("The amount of breaths required for the third heightening.")
+            .defineInRange("heighteningThresholdThird", 50, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_FOURTH = BUILDER
+            .comment("The amount of breaths required for the fourth heightening.")
+            .defineInRange("heighteningThresholdFourth", 100, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_FIFTH = BUILDER
+            .comment("The amount of breaths required for the fifth heightening.")
+            .defineInRange("heighteningThresholdFifth", 150, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_SIXTH = BUILDER
+            .comment("The amount of breaths required for the sixth heightening.")
+            .defineInRange("heighteningThresholdSixth", 250, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_SEVENTH = BUILDER
+            .comment("The amount of breaths required for the seventh heightening.")
+            .defineInRange("heighteningThresholdSeventh", 400, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_EIGHTH = BUILDER
+            .comment("The amount of breaths required for the eighth heightening.")
+            .defineInRange("heighteningThresholdEighth", 600, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_NINTH = BUILDER
+            .comment("The amount of breaths required for the ninth heightening.")
+            .defineInRange("heighteningThresholdNinth", 1000, 0, Integer.MAX_VALUE);
+
+    public static final ForgeConfigSpec.IntValue HEIGHTENING_THRESHOLD_TENTH = BUILDER
+            .comment("The amount of breaths required for the tenth heightening.")
+            .defineInRange("heighteningThresholdTenth", 2000, 0, Integer.MAX_VALUE);
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 }
