@@ -183,7 +183,7 @@ public class BreathEvents {
             }
 
             if (killer instanceof Player killerPlayer) {
-                int transfer = Math.max(1, victimBreath / 5);
+                int transfer = Math.max(1, (int) (victimBreath * Config.PLAYER_KILL_TRANSFER_PERCENTAGE.get()));
                 ItemStack mainHand = killerPlayer.getMainHandItem();
                 if (mainHand.is(Awakened.NIGHTBLOOD.get())) {
                     int totalStolen = Math.round(transfer * 1.5f);
@@ -204,7 +204,7 @@ public class BreathEvents {
                     .map(IBreath::getBreath)
                     .orElse(0);
             int transfer = Math.round((victimBreath * (float) victimBreath) / 500f);
-            if (transfer <= 0) {
+            if (transfer <= 0 || !Config.MOB_KILL_TRANSFER.get()) {
                 return;
             }
             ItemStack mainHand = killerPlayer.getMainHandItem();

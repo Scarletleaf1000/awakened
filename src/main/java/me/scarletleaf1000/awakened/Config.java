@@ -80,5 +80,19 @@ public class Config {
             .comment("The amount of breaths required for the tenth heightening.")
             .defineInRange("heighteningThresholdTenth", 2000, 0, Integer.MAX_VALUE);
 
+    public static final ForgeConfigSpec.BooleanValue MOB_KILL_TRANSFER = BUILDER
+            .comment("Should players receive breaths upon killing mobs.")
+            .define("mobKillTransfer", true);
+
+    public static final ForgeConfigSpec.DoubleValue PLAYER_KILL_TRANSFER_PERCENTAGE = BUILDER
+            .comment("The amount of breaths given to the player when they kill another player.")
+            .defineInRange("playerKillTransferPercentage", 0.2, 0, 1);
+
+    public static final ForgeConfigSpec.DoubleValue NIGHTBLOOD_MAX_DAMAGE = BUILDER
+            .comment("The maximum damage nightblood can do.")
+            .defineInRange("nightbloodMaxDamage", -1, -1, Double.MAX_VALUE);
+
+
+
     public static final ForgeConfigSpec SPEC = BUILDER.build();
 }

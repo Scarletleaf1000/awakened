@@ -2,6 +2,7 @@ package me.scarletleaf1000.awakened.item;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import me.scarletleaf1000.awakened.Config;
 import me.scarletleaf1000.awakened.breath.BreathProvider;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.chat.Component;
@@ -88,7 +89,8 @@ public class NightbloodSwordItem extends SwordItem {
         Multimap<Attribute, AttributeModifier> modifiers = HashMultimap.create(super.getAttributeModifiers(slot, stack));
         if (slot == EquipmentSlot.MAINHAND) {
             int breath = getStoredBreath(stack);
-            double bonusDamage = DAMAGE_MULTIPLIER * Math.pow(breath, DAMAGE_EXPONENT);
+            double maxDamage =  Config.NIGHTBLOOD_MAX_DAMAGE.get(); if (maxDamage < 0) maxDamage = Double.MAX_VALUE;
+            double bonusDamage = Math.min((DAMAGE_MULTIPLIER * Math.pow(breath, DAMAGE_EXPONENT)), maxDamage);
             modifiers.removeAll(Attributes.ATTACK_DAMAGE);
             modifiers.put(Attributes.ATTACK_DAMAGE, new AttributeModifier(Item.BASE_ATTACK_DAMAGE_UUID, "Nightblood damage modifier", bonusDamage, AttributeModifier.Operation.ADDITION));
         }
