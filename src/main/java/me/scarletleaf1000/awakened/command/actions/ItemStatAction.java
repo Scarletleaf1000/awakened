@@ -1,5 +1,6 @@
 package me.scarletleaf1000.awakened.command.actions;
 
+import me.scarletleaf1000.awakened.AwakenedServerConfig;
 import me.scarletleaf1000.awakened.command.Action;
 import me.scarletleaf1000.awakened.command.ActionType;
 import me.scarletleaf1000.awakened.command.CommandContext;
@@ -21,23 +22,13 @@ public class ItemStatAction implements Action {
     }
 
     private final String translationKey;
-    private final int cost;
-    private final int minHeightening;
+    private final AwakenedServerConfig.ActionTuning tuning;
     private final Effect effect;
-    private final double amount;
-    private final double secondaryAmount;
 
-    public ItemStatAction(String translationKey, int cost, int minHeightening, Effect effect, double amount) {
-        this(translationKey, cost, minHeightening, effect, amount, 0.0D);
-    }
-
-    public ItemStatAction(String translationKey, int cost, int minHeightening, Effect effect, double amount, double secondaryAmount) {
+    public ItemStatAction(AwakenedServerConfig.ActionTuning tuning, String translationKey, Effect effect) {
         this.translationKey = translationKey;
-        this.cost = cost;
-        this.minHeightening = minHeightening;
+        this.tuning = tuning;
         this.effect = effect;
-        this.amount = amount;
-        this.secondaryAmount = secondaryAmount;
     }
 
     @Override
@@ -52,12 +43,12 @@ public class ItemStatAction implements Action {
 
     @Override
     public int cost() {
-        return cost;
+        return tuning.cost();
     }
 
     @Override
     public int minHeightening() {
-        return minHeightening;
+        return tuning.minHeightening();
     }
 
     @Override
@@ -67,7 +58,30 @@ public class ItemStatAction implements Action {
 
     @Override
     public Component getDescription() {
-        return Component.translatable(translationKey + ".description");
+        return Component.translatable(translationKey + ".description", getDescriptionArgs());
+    }
+
+    /**
+     * Builds the %s arguments for this action's description translation.
+     * Percent-based strengths are formatted with a '%' suffix.
+     */
+    private Object[] getDescriptionArgs() {
+        return switch (effect) {
+            case UNBREAKABLE, HIDE -> new Object[0];
+            case SPEED -> new Object[]{formatPercent(getAmount())};
+            case ATTACK_AND_MINING_SPEED -> new Object[]{formatNumber(getAmount()), formatPercent(getSecondaryAmount())};
+            case JUMP -> new Object[]{formatNumber(getAmount()), formatNumber(getSecondaryAmount())};
+            default -> new Object[]{formatNumber(getAmount())};
+        };
+    }
+
+    private static String formatPercent(double value) {
+        return formatNumber(value * 100.0D) + "%";
+    }
+
+    private static String formatNumber(double value) {
+        double rounded = Math.round(value * 100.0D) / 100.0D;
+        return rounded == Math.floor(rounded) ? Long.toString((long) rounded) : Double.toString(rounded);
     }
 
     @Override
@@ -79,11 +93,11 @@ public class ItemStatAction implements Action {
     }
 
     public double getAmount() {
-        return amount;
+        return tuning.strength();
     }
 
     public double getSecondaryAmount() {
-        return secondaryAmount;
+        return tuning.secondaryStrength();
     }
 
     public boolean canApplyTo(ItemStack stack) {

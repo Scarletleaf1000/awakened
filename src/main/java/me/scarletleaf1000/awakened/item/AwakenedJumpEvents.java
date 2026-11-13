@@ -1,6 +1,9 @@
 package me.scarletleaf1000.awakened.item;
 
 import me.scarletleaf1000.awakened.Awakened;
+import me.scarletleaf1000.awakened.command.Action;
+import me.scarletleaf1000.awakened.command.CommandRegistries;
+import me.scarletleaf1000.awakened.command.actions.ItemStatAction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -24,11 +27,11 @@ public final class AwakenedJumpEvents {
             return;
         }
 
-        double boost = switch (actionId.getPath()) {
-            case "jump" -> 0.20D;
-            case "launch" -> 0.35D;
-            default -> 0.0D;
-        };
+        Action action = CommandRegistries.ACTION_REGISTRY.get().getValue(actionId);
+        if (!(action instanceof ItemStatAction statAction) || statAction.getEffect() != ItemStatAction.Effect.JUMP) {
+            return;
+        }
+        double boost = statAction.getAmount();
         if (boost > 0) {
             entity.setDeltaMovement(entity.getDeltaMovement().add(0.0D, boost, 0.0D));
         }

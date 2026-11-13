@@ -35,6 +35,7 @@ import net.minecraftforge.event.entity.EntityJoinLevelEvent;
 import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.player.EntityItemPickupEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
+import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.Mod;
@@ -64,7 +65,7 @@ public class BreathEvents {
         to.getCapability(BreathProvider.BREATH).ifPresent(b -> b.setBreath(breath));
     }
 
-    @SubscribeEvent
+    @SubscribeEvent(priority = EventPriority.LOWEST)
     public static void onPlayerLoggedIn(PlayerEvent.PlayerLoggedInEvent event) {
         if (event.getEntity() instanceof ServerPlayer player) {
             migrateFromLegacyNBT(player);
@@ -113,6 +114,9 @@ public class BreathEvents {
 
     private static void migrateFromLegacyNBT(LivingEntity entity) {
         CompoundTag nbt = entity.saveWithoutId(new CompoundTag());
+        if (entity instanceof Player p) {
+            nbt = p.getPersistentData();
+        }
         if (!nbt.contains("ForgeCaps", Tag.TAG_COMPOUND)) {
             return;
         }

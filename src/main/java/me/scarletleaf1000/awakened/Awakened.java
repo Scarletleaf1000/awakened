@@ -104,6 +104,7 @@ public class Awakened {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModLoadingContext.get().registerConfig(ModConfig.Type.COMMON, Config.SPEC);
+        ModLoadingContext.get().registerConfig(ModConfig.Type.SERVER, AwakenedServerConfig.SPEC);
 
         // Register the deferred registers to the mod event bus
         BLOCKS.register(modEventBus);
